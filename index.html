@@ -1,0 +1,2509 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="GAMBULL — a psychological game about staking your pride in social situations, climbing from Unknown to The Top, and knowing when to walk away.">
+<meta name="theme-color" content="#0B0C0F">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="GAMBULL">
+<meta property="og:description" content="You don't gamble with money here. You gamble with pride.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B0C0F'/%3E%3Cpath d='M7 25c3 0 4.6-4.6 5.1-10.2.3-3.3.4-7.4.4-9.6M25 25c-3 0-4.6-4.6-5.1-10.2-.3-3.3-.4-7.4-.4-9.6' fill='none' stroke='%23C8A64B' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M12.4 21 16 17.4 19.6 19.4' fill='none' stroke='%23ECE8E1' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>GAMBULL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
+
+<style>
+/* GAMBULL — premium betting terminal. One committed dark world; every colour painted explicitly. */
+:root{
+  --bg:#0B0C0F; --surface:#121419; --surface-2:#171A21; --surface-3:#1E222B;
+  --line:#23272F; --line-2:#2E333D;
+  --text:#ECE8E1; --text-2:#C9C5BD; --mute:#8F95A3; --mute-2:#626876;
+  --gold:#C8A64B; --gold-lt:#E2C677; --gold-ink:#1B1608;
+  --green:#4FB286; --green-bg:rgba(79,178,134,.12);
+  --crimson:#D2455A; --crimson-bg:rgba(210,69,90,.12);
+  --r-neutral:#8E9AAF; --r-amber:#D9A23A; --r-orange:#DB7A34; --r-crimson:#D2455A; --r-deep:#A5283C;
+  --steel:#7F97C9;
+  --band:#8E9AAF;
+  --radius:14px; --radius-sm:10px;
+  --f-ui:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-disp:'Instrument Serif',Georgia,'Times New Roman',serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-ui);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold-lt);outline-offset:2px}
+.tn{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.up{color:var(--green)} .down{color:var(--crimson)}
+
+/* ------------------------------------------------ top bar */
+.top{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:10;
+  display:flex;align-items:center;gap:18px;padding:12px 20px;
+  background:rgba(11,12,15,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand b{font-weight:700;font-size:15px;letter-spacing:.22em}
+.brand b i{font-style:normal;color:var(--gold)}
+.runtag{font-size:12.5px;color:var(--mute);padding-left:16px;border-left:1px solid var(--line)}
+.runtag b{color:var(--text-2);font-weight:600}
+.spacer{flex:1}
+.wallet{display:flex;align-items:stretch;border:1px solid var(--line-2);border-radius:var(--radius-sm);background:var(--surface);overflow:hidden}
+.wallet > div{padding:7px 14px;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.wallet > div + div{border-left:1px solid var(--line)}
+.wallet .k{font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mute-2)}
+.wallet .v{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.wallet .main .v{font-size:21px;font-weight:700;line-height:1.1}
+.wallet .main .v small{font-size:11px;font-weight:600;color:var(--mute);margin-left:4px;letter-spacing:.06em}
+.delta{font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--mute)}
+.navbtn{height:38px;padding:0 14px;border-radius:var(--radius-sm);border:1px solid var(--line-2);background:var(--surface);font-weight:600;font-size:13px;color:var(--text-2);transition:.15s}
+.navbtn:hover{border-color:var(--mute-2);color:var(--text)}
+.iconbtn{width:38px;height:38px;border-radius:var(--radius-sm);border:1px solid var(--line-2);background:var(--surface);display:grid;place-items:center;color:var(--mute);transition:.15s}
+.iconbtn:hover{color:var(--text)}
+.iconbtn[aria-pressed="false"]{opacity:.45}
+.iconbtn svg{width:17px;height:17px}
+
+/* ------------------------------------------------ layout */
+.main{max-width:1240px;margin:0 auto;padding:20px 20px calc(40px + env(safe-area-inset-bottom,0px));
+  display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start}
+.col{display:grid;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;padding:16px 18px 0}
+.card-h h2{margin:0;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.card-h span{font-size:12px;color:var(--mute-2)}
+
+/* ------------------------------------------------ state card */
+.state-body{display:grid;grid-template-columns:minmax(240px,1.05fr) minmax(0,1fr);gap:8px 22px;padding:10px 18px 18px;align-items:center}
+.gauge{position:relative;width:100%;max-width:340px;margin:0 auto}
+.gauge svg{display:block;width:100%;height:auto;overflow:visible}
+.gauge .read{position:absolute;left:0;right:0;bottom:2px;text-align:center}
+.gauge .num{font-family:var(--f-disp);font-size:clamp(58px,8vw,84px);line-height:.9;font-variant-numeric:tabular-nums;color:var(--text)}
+.gauge .bandlbl{margin-top:6px;display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--band)}
+.gauge .bandlbl::before{content:'';width:18px;height:2px;background:currentColor}
+.gauge .bandlbl::after{content:'';width:18px;height:2px;background:currentColor}
+.gauge .cap{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mute-2);text-align:center;margin-bottom:8px}
+.metrics{display:grid;gap:0}
+.metric{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:4px 10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.metric:last-child{border-bottom:0}
+.metric .k{font-size:13px;color:var(--mute)}
+.metric .k small{display:block;font-size:11.5px;color:var(--mute-2)}
+.metric .v{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.metric .bar{grid-column:1/-1;height:3px;border-radius:2px;background:var(--surface-3);overflow:hidden}
+.metric .bar i{display:block;height:100%;border-radius:2px;transition:width .6s cubic-bezier(.2,.8,.3,1),background .4s}
+.metric .chg{font-size:11.5px;font-weight:600;margin-left:6px}
+.hidden-pill{font-size:12px;font-weight:600;color:var(--mute);border:1px dashed var(--line-2);border-radius:99px;padding:3px 10px}
+.observe{margin:0 18px 18px;padding:12px 14px;border-radius:var(--radius-sm);background:var(--surface-2);border:1px solid var(--line);display:flex;gap:12px;align-items:flex-start;min-height:48px}
+.observe .t{flex:0 0 auto;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:var(--surface-3);color:var(--gold-lt);margin-top:1px}
+.observe .m{font-size:14px;color:var(--text-2)}
+.observe .m em{font-style:normal;color:var(--mute);display:block;font-size:13px;margin-top:2px;opacity:0;transition:opacity .5s}
+.observe .m em.on{opacity:1}
+.observe.close{border-color:rgba(210,69,90,.45);background:linear-gradient(90deg,rgba(210,69,90,.10),var(--surface-2))}
+.observe.close .t{background:var(--crimson);color:#fff}
+.observe.flash{animation:obsIn .45s cubic-bezier(.2,.8,.3,1)}
+@keyframes obsIn{from{opacity:.2;transform:translateY(4px)}}
+
+/* ------------------------------------------------ situation */
+.cat{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:99px;border:1px solid var(--line-2);color:var(--text-2)}
+.cat.Temptation{border-color:rgba(210,69,90,.55);color:var(--crimson);background:var(--crimson-bg)}
+.cat.Reflection{border-color:rgba(127,151,201,.5);color:var(--steel)}
+.sit-body{padding:8px 18px 18px;display:grid;gap:14px}
+.sit-title{font-family:var(--f-disp);font-weight:400;font-size:clamp(30px,4vw,40px);line-height:1.02;margin:0;text-wrap:balance}
+.sit-scene{margin:-6px 0 0;color:var(--text-2);font-size:15.5px;max-width:62ch}
+.signal{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line)}
+.signal .k{flex:0 0 auto;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);padding-top:3px}
+.signal p{margin:0;font-size:14.5px;color:var(--text)}
+.signal small{display:block;color:var(--mute-2);font-size:12px;margin-top:2px}
+.moves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.moves.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.move{text-align:left;padding:12px 13px;border-radius:11px;border:1px solid var(--line-2);background:var(--surface-2);display:grid;gap:5px;align-content:start;transition:border-color .15s,background .15s}
+.move:hover:not(:disabled){border-color:var(--mute-2)}
+.move[aria-checked="true"]{border-color:var(--gold);background:rgba(200,166,75,.08);box-shadow:inset 0 0 0 1px var(--gold)}
+.move:disabled{opacity:.4;cursor:not-allowed}
+.move .mk{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.mk.safe{color:var(--green)} .mk.bold{color:var(--r-amber)} .mk.allin{color:var(--crimson)} .mk.ref{color:var(--steel)}
+.move b{font-size:14.5px;font-weight:600;line-height:1.3}
+.move .ms{font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+.sit-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.pass{height:40px;padding:0 16px;border-radius:10px;border:1px dashed var(--line-2);color:var(--text-2);font-weight:600;font-size:13px}
+.pass:hover:not(:disabled){border-style:solid;color:var(--text)}
+.pass:disabled{opacity:.35;cursor:not-allowed}
+.turns{display:flex;gap:3px;align-items:center}
+.turns i{width:12px;height:4px;border-radius:2px;background:var(--surface-3)}
+.turns i.d{background:var(--mute-2)} .turns i.c{background:var(--gold);width:20px}
+.turns span{font-size:11.5px;color:var(--mute-2);margin-left:8px}
+.slip.waiting .slip-body > :not(.place):not(.secondary){opacity:.35;pointer-events:none}
+.story{font-size:14px;color:var(--text-2);margin-top:8px;font-style:italic;font-family:var(--f-disp);font-size:19px}
+
+.scene{border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,#0F131B,#0A0C11);overflow:hidden;position:relative}
+.scene::after{content:'';position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 100%,transparent 40%,rgba(10,12,17,.75));pointer-events:none}
+.scene{aspect-ratio:420/150}
+.scene svg{display:block;width:100%;height:100%}
+.scene .sway{transform-origin:200px 0;animation:sway 7s ease-in-out infinite}
+.scene .sway2{transform-origin:280px 0;animation:sway 9s ease-in-out infinite reverse}
+.scene .blink{animation:blink 1.6s steps(1) infinite}
+.scene .pulse{animation:pulseS 2.6s ease-in-out infinite}
+.scene .flash{animation:flash 4s ease-in-out infinite}
+.scene .rise1{animation:rise 4.5s ease-in infinite}
+.scene .rise2{animation:rise 5.5s ease-in .8s infinite}
+.scene .rise3{animation:rise 6.5s ease-in 1.6s infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+@keyframes blink{0%,60%{opacity:1}61%,100%{opacity:.15}}
+@keyframes pulseS{0%,100%{opacity:.35;transform:scale(.9)}50%{opacity:.9;transform:scale(1.12)}}
+@keyframes flash{0%,88%{opacity:.25}92%{opacity:1}96%{opacity:.4}100%{opacity:.25}}
+@keyframes rise{0%{transform:translateY(14px);opacity:0}20%{opacity:.9}100%{transform:translateY(-46px);opacity:0}}
+
+/* ------------------------------------------------ ledger */
+.ledger{width:100%;border-collapse:collapse;font-size:13px}
+.ledger-wrap{padding:8px 8px 10px;overflow-x:auto}
+.ledger th{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mute-2);text-align:right;padding:8px 10px;white-space:nowrap}
+.ledger td{padding:10px;text-align:right;border-top:1px solid var(--line);color:var(--text-2);white-space:nowrap}
+.ledger th:first-child,.ledger td:first-child{text-align:left}
+.ledger td.n{font-family:var(--f-mono);color:var(--mute-2)}
+.ledger td.res{font-weight:700}
+.ledger tr.g td{color:var(--steel)}
+.ledger tr.new td{animation:rowIn .6s ease}
+@keyframes rowIn{from{background:rgba(200,166,75,.12)}}
+.dq{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px}
+.dq.Strong{background:var(--green-bg);color:var(--green)}
+.dq.Sound{background:rgba(142,154,175,.14);color:var(--text-2)}
+.dq.Risky{background:rgba(217,162,58,.14);color:var(--r-amber)}
+.dq.Reckless{background:var(--crimson-bg);color:var(--crimson)}
+.empty{padding:26px 18px 30px;color:var(--mute-2);font-size:13.5px;text-align:center}
+
+/* ------------------------------------------------ bet slip */
+.slip{position:relative;overflow:hidden}
+.slip-body{padding:14px 18px 18px;display:grid;gap:14px}
+.amt{display:grid;grid-template-columns:48px 1fr 48px;gap:8px}
+.stepb{height:54px;border-radius:var(--radius-sm);background:var(--surface-2);border:1px solid var(--line-2);font-size:22px;color:var(--text-2);transition:.12s}
+.stepb:hover:not(:disabled){background:var(--surface-3);color:var(--text)}
+.amt-field{display:flex;align-items:center;justify-content:center;gap:8px;height:54px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--line-2)}
+.amt-field:focus-within{border-color:var(--gold)}
+.amt-field input{width:6ch;min-width:0;text-align:right;background:none;border:0;outline:0;font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.amt-field input::-webkit-outer-spin-button,.amt-field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.amt-field span{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--mute)}
+.range{width:100%;accent-color:var(--gold);margin:0;height:22px}
+.presets{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.preset{padding:8px 4px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);display:grid;gap:1px;text-align:center;transition:.12s}
+.preset b{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.preset small{font-size:11px;color:var(--green);font-variant-numeric:tabular-nums}
+.preset:hover:not(:disabled){border-color:var(--mute-2)}
+.preset[aria-pressed="true"]{border-color:var(--gold);background:rgba(200,166,75,.08)}
+.preset:disabled{opacity:.35;cursor:not-allowed}
+.outcomes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.oc{padding:12px;border-radius:var(--radius-sm);border:1px solid var(--line)}
+.oc .k{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mute-2)}
+.oc .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+.oc .s{font-size:12px;color:var(--mute)}
+.oc.win{background:var(--green-bg);border-color:rgba(79,178,134,.3)} .oc.win .v{color:var(--green)}
+.oc.loss{background:var(--crimson-bg);border-color:rgba(210,69,90,.28)} .oc.loss .v{color:var(--crimson)}
+.lines{display:grid}
+.line{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.line:last-child{border-bottom:0}
+.line .k{font-size:13px;color:var(--mute)}
+.line .v{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.chip{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:5px;margin-left:6px;vertical-align:1px}
+.expbar{height:6px;border-radius:3px;background:var(--surface-3);position:relative;overflow:hidden;margin-top:-2px}
+.expbar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;transition:width .25s,background .25s}
+.expbar u{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--text-2);text-decoration:none}
+.skills{display:flex;flex-wrap:wrap;gap:5px;padding:2px 0 4px}
+.skills span{font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);color:var(--text-2)}
+.skills span.p{color:var(--green);border-color:rgba(79,178,134,.3)}
+.skills span.n{color:var(--r-amber);border-color:rgba(217,162,58,.3)}
+.total{display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;border-top:1px solid var(--line-2)}
+.total .k{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.total .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.place{height:56px;border-radius:12px;background:var(--gold);color:var(--gold-ink);font-size:16px;font-weight:700;letter-spacing:.04em;transition:filter .15s,transform .08s}
+.place:hover:not(:disabled){filter:brightness(1.08)}
+.place:active:not(:disabled){transform:translateY(1px)}
+.place:disabled{background:var(--surface-3);color:var(--mute-2);cursor:not-allowed}
+.secondary{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sec{height:46px;border-radius:11px;border:1px solid var(--line-2);font-weight:600;font-size:13.5px;color:var(--text-2);transition:.15s}
+.sec:hover:not(:disabled){border-color:var(--mute-2);color:var(--text)}
+.sec:disabled{opacity:.35;cursor:not-allowed}
+.sec.ground{border-color:rgba(127,151,201,.4);color:#C8D4F0}
+.dqline{font-size:12.5px;color:var(--mute)}
+.lastres{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 18px 0;padding:9px 12px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);font-size:12.5px}
+.lastres b{font-weight:700}
+.lastres span{color:var(--mute)}
+
+/* resolution overlay */
+.resolve{position:absolute;inset:0;z-index:3;background:rgba(18,20,25,.97);display:flex;flex-direction:column;justify-content:center;gap:14px;padding:26px 24px;cursor:pointer}
+.resolve[hidden]{display:none}
+.rs-step{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--mute);opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s}
+.rs-step.on{opacity:1;transform:none}
+.rs-step b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.rs-head{font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute-2)}
+.rs-out{text-align:center;padding:16px 0 6px;border-top:1px solid var(--line);opacity:0;transition:opacity .3s}
+.rs-out.on{opacity:1}
+.rs-out .w{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.rs-out .big{font-family:var(--f-disp);font-size:64px;line-height:1;margin-top:4px}
+.rs-out .amt2{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:4px}
+.rs-dq{text-align:center;font-size:13px;color:var(--mute);opacity:0;transition:opacity .3s}
+.rs-dq.on{opacity:1}
+.rs-dq b{color:var(--text)}
+.rs-skip{text-align:center;font-size:11.5px;color:var(--mute-2)}
+
+/* risk management */
+.risk-body{padding:12px 18px 18px;display:grid;gap:12px}
+.stones{display:flex;gap:8px;align-items:center}
+.stone{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#9BB0DA,#4A5E8C);box-shadow:0 0 0 1px #5A6E9C}
+.stone.x{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line-2)}
+.risk-lead{font-size:13.5px;color:var(--mute);margin:0}
+.preview{display:grid;gap:0;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden}
+.preview div{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:baseline;padding:8px 12px;font-size:13px;font-variant-numeric:tabular-nums}
+.preview div + div{border-top:1px solid var(--line)}
+.preview .k{color:var(--mute)}
+.preview .a{color:var(--mute-2);text-decoration:line-through}
+.preview .ar{color:var(--mute-2)}
+.preview .b{font-weight:700;color:var(--text)}
+.groundbtn{height:46px;border-radius:11px;background:#1B2336;border:1px solid rgba(127,151,201,.45);color:#D6DEF3;font-weight:700;font-size:14px;transition:.15s}
+.groundbtn:hover:not(:disabled){background:#222C44}
+.groundbtn:disabled{opacity:.35;cursor:not-allowed}
+
+.feed{list-style:none;margin:0;padding:6px 18px 16px;display:grid;gap:0}
+.feed li{display:grid;grid-template-columns:104px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px;color:var(--text-2)}
+.feed li:first-child{border-top:0}
+.feed li b{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-lt);padding-top:2px}
+.feed li.close b{color:var(--crimson)}
+.feed li.mirror b{color:var(--steel)}
+.feed li span small{color:var(--mute-2);font-family:var(--f-mono);font-size:11px;margin-right:6px}
+
+/* ------------------------------------------------ motion */
+.sit-in{animation:cardIn .5s cubic-bezier(.2,.9,.3,1)}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px) scale(.995)}}
+.sit-in .sit-title{animation:titleIn .55s cubic-bezier(.2,.9,.3,1) .04s both}
+@keyframes titleIn{from{opacity:0;transform:translateY(8px)}}
+.sit-in .scene{animation:artIn .6s cubic-bezier(.2,.9,.3,1) .08s both}
+@keyframes artIn{from{opacity:0;transform:scale(1.03)}}
+.sit-in .move{animation:moveIn .45s cubic-bezier(.2,.9,.3,1) both}
+.sit-in .move:nth-child(1){animation-delay:.14s}
+.sit-in .move:nth-child(2){animation-delay:.22s}
+.sit-in .move:nth-child(3){animation-delay:.30s}
+@keyframes moveIn{from{opacity:0;transform:translateY(8px)}}
+.move[aria-checked="true"]{animation:pick .3s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes pick{50%{transform:translateY(-3px) scale(1.015)}}
+#w-bal.up{animation:balUp .8s ease}
+#w-bal.down{animation:balDown .8s ease}
+@keyframes balUp{0%,40%{color:var(--green);text-shadow:0 0 20px rgba(79,178,134,.6)}100%{color:var(--text);text-shadow:none}}
+@keyframes balDown{0%,40%{color:var(--crimson);text-shadow:0 0 20px rgba(210,69,90,.6)}100%{color:var(--text);text-shadow:none}}
+.gauge.bump{animation:bump .6s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes bump{40%{transform:scale(1.035)}}
+.place{position:relative;overflow:hidden}
+.place::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);animation:sheen 4.5s ease-in-out infinite}
+@keyframes sheen{0%,72%{left:-60%}88%{left:120%}100%{left:120%}}
+
+/* round intro */
+.round{position:fixed;inset:0;z-index:55;display:grid;place-content:center;justify-items:center;text-align:center;gap:6px;
+  background:radial-gradient(70% 60% at 50% 45%,rgba(20,24,34,.97),rgba(6,7,9,.98));cursor:pointer;animation:fade .4s ease}
+.round[hidden]{display:none}
+.round .rk{font-size:12px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);animation:riseIn .5s ease both}
+.round h2{font-family:var(--f-disp);font-weight:400;font-size:clamp(46px,11vw,92px);line-height:1;margin:6px 0;animation:riseIn .6s ease .1s both}
+.round p{margin:0;color:var(--text-2);font-size:17px;animation:riseIn .6s ease .2s both}
+.round .note{color:var(--mute);font-size:14px;margin-top:10px;animation:riseIn .6s ease .3s both}
+.round .bar{width:min(320px,70vw);height:3px;border-radius:2px;background:var(--line);margin-top:22px;overflow:hidden;animation:riseIn .6s ease .35s both}
+.round .bar i{display:block;height:100%;width:0;background:var(--gold);animation:fill 2.4s linear forwards}
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}}
+@keyframes fill{to{width:100%}}
+.rbadge{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(200,166,75,.4);border-radius:99px;padding:3px 9px}
+
+/* result stamp + continue */
+.rs-out .big{animation:stamp .45s cubic-bezier(.2,.9,.3,1.5) both}
+@keyframes stamp{from{opacity:0;transform:scale(1.5) rotate(-3deg)}}
+.rs-cont{margin-top:4px;align-self:center;padding:10px 20px;border-radius:10px;border:1px solid var(--line-2);
+  font-size:13px;font-weight:700;color:var(--text-2);opacity:0;transition:opacity .3s;position:relative;overflow:hidden}
+.rs-cont.on{opacity:1}
+.rs-cont i{position:absolute;left:0;bottom:0;height:2px;background:var(--gold);width:0}
+.rs-cont.on i{animation:fill 5s linear forwards}
+
+/* ------------------------------------------------ overlays */
+.overlay{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:rgba(6,7,9,.82);backdrop-filter:blur(3px);overflow:auto}
+.overlay[hidden]{display:none}
+.sheet{width:min(560px,100%);background:var(--surface);border:1px solid var(--line-2);border-radius:18px;padding:26px;position:relative;max-height:100%;overflow:auto}
+.sheet.wide{width:min(920px,100%)}
+.x{position:absolute;right:14px;top:14px;width:36px;height:36px;border-radius:9px;border:1px solid var(--line-2);color:var(--mute);font-size:18px}
+.x:hover{color:var(--text)}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.sheet h2{font-family:var(--f-disp);font-weight:400;font-size:clamp(34px,6vw,48px);line-height:1;margin:8px 0 6px;text-wrap:balance}
+.sheet h3{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:24px 0 10px}
+.sheet p.lead{color:var(--text-2);font-size:15px;margin:0;max-width:56ch}
+.kv{display:grid;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;margin-top:16px}
+.kv div{display:flex;justify-content:space-between;padding:10px 14px;font-size:14px}
+.kv div + div{border-top:1px solid var(--line)}
+.kv .k{color:var(--mute)} .kv .v{font-weight:600;font-variant-numeric:tabular-nums}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.btn-gold{height:50px;padding:0 24px;border-radius:12px;background:var(--gold);color:var(--gold-ink);font-weight:700;font-size:15px}
+.btn-gold:hover{filter:brightness(1.07)}
+.btn-line{height:50px;padding:0 20px;border-radius:12px;border:1px solid var(--line-2);color:var(--text-2);font-weight:600;font-size:14px}
+.btn-line:hover{color:var(--text);border-color:var(--mute-2)}
+.btn-steel{height:50px;padding:0 22px;border-radius:12px;background:#1B2336;border:1px solid rgba(127,151,201,.5);color:#D6DEF3;font-weight:700;font-size:15px}
+
+/* intro */
+.intro{text-align:left}
+.intro .word{font-weight:700;letter-spacing:.3em;font-size:14px;color:var(--text-2)}
+.intro .word i{font-style:normal;color:var(--gold)}
+.intro h1{font-family:var(--f-disp);font-weight:400;font-size:clamp(40px,8vw,60px);line-height:.98;margin:14px 0 4px}
+.intro .tag{color:var(--mute);font-size:15px;margin:0 0 20px}
+.intro ul{list-style:none;margin:0;padding:0;display:grid;border-top:1px solid var(--line)}
+.intro li{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px;color:var(--text-2)}
+.intro li b{color:var(--text);font-weight:600;text-align:right}
+.challenge{margin-top:16px;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid rgba(200,166,75,.35);background:rgba(200,166,75,.06)}
+.challenge .k{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.challenge p{margin:3px 0 0;font-size:14px;color:var(--text)}
+.challenge small{display:block;color:var(--mute);font-size:12.5px;margin-top:2px}
+.fine{font-size:12px;color:var(--mute-2);margin-top:14px}
+
+/* moments */
+.moment{position:fixed;inset:0;z-index:50;display:grid;place-content:center;text-align:center;gap:10px;background:rgba(6,7,9,.94);padding:24px;cursor:pointer;animation:fade .5s ease}
+.moment[hidden]{display:none}
+.moment .num{font-family:var(--f-disp);font-size:clamp(110px,24vw,220px);line-height:.85;color:var(--band);font-variant-numeric:tabular-nums}
+.moment h2{margin:12px 0 0;font-family:var(--f-disp);font-weight:400;font-size:clamp(30px,6vw,52px)}
+.moment p{margin:0;color:var(--gold-lt);font-size:16px;opacity:0;transition:opacity .6s}
+.moment p.on{opacity:1}
+.moment.crash .num{color:var(--crimson)}
+.moment .sub{color:var(--text-2);font-size:15px;max-width:44ch;margin:6px auto 0;opacity:0;transition:opacity .5s}
+.moment .sub.on{opacity:1}
+.moment .btns{justify-content:center;opacity:0;transition:opacity .4s}
+.moment .btns.on{opacity:1}
+@keyframes fade{from{opacity:0}}
+
+/* summary */
+.statgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;margin-top:18px}
+.statgrid div{background:var(--surface);padding:12px 14px}
+.statgrid dt{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mute-2)}
+.statgrid dd{margin:3px 0 0;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.chartbox{margin-top:16px;border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px 8px;background:var(--bg)}
+.chartbox .cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;font-size:11.5px;color:var(--mute-2);margin-bottom:6px}
+.chartbox .cap i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.chartbox svg{display:block;width:100%;height:auto}
+.insight{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.insight > div{padding:16px;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--surface-2)}
+.insight .k{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.insight p{margin:6px 0 0;font-size:15.5px;color:var(--text)}
+.insight small{display:block;margin-top:6px;font-size:12.5px;color:var(--mute)}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.badge{font-size:12px;font-weight:600;padding:5px 10px;border-radius:99px;border:1px solid rgba(200,166,75,.4);color:var(--gold-lt);background:rgba(200,166,75,.07)}
+.badge.ok{border-color:rgba(79,178,134,.4);color:var(--green);background:var(--green-bg)}
+.badge.no{border-color:var(--line-2);color:var(--mute);background:none}
+.dqbar{display:flex;height:10px;border-radius:5px;overflow:hidden;margin-top:8px;background:var(--surface-3)}
+.dqbar i{display:block;height:100%}
+.dqlegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--mute);margin-top:8px}
+.dqlegend span::before{content:'';display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;background:var(--c)}
+
+/* records */
+.arch{display:grid;grid-template-columns:1fr auto;gap:10px 20px;padding:18px;border-radius:var(--radius);background:linear-gradient(135deg,#1A1D25,#121419);border:1px solid var(--line-2);margin-top:16px}
+.arch .k{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute-2)}
+.arch .name{font-family:var(--f-disp);font-size:clamp(30px,5vw,42px);line-height:1;margin:4px 0}
+.arch p{margin:0;color:var(--text-2);font-size:14px;max-width:48ch}
+.arch .prev{text-align:right;align-self:start}
+.arch .prev b{display:block;font-size:14px;color:var(--text-2);margin-top:3px}
+.recgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.rec{padding:13px 14px;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--surface-2)}
+.rec .k{font-size:11.5px;color:var(--mute)}
+.rec .v{font-size:21px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+.rec .s{font-size:11.5px;color:var(--mute-2)}
+.rec.none .v{color:var(--mute-2)}
+.behav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden}
+.behav div{background:var(--surface);padding:11px 13px}
+.behav dt{font-size:11.5px;color:var(--mute)}
+.behav dd{margin:2px 0 0;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.runs{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+.runs th{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mute-2);text-align:right;padding:8px 10px}
+.runs td{padding:9px 10px;border-top:1px solid var(--line);text-align:right;color:var(--text-2);font-variant-numeric:tabular-nums}
+.runs th:first-child,.runs td:first-child,.runs th:nth-child(2),.runs td:nth-child(2){text-align:left}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius-sm)}
+.oct{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:5px}
+.oct.w{background:var(--green-bg);color:var(--green)} .oct.c{background:var(--crimson-bg);color:var(--crimson)}
+.oct.d{background:rgba(142,154,175,.14);color:var(--text-2)} .oct.s{background:rgba(200,166,75,.14);color:var(--gold-lt)}
+
+/* debug */
+#debug{position:fixed;left:12px;bottom:12px;z-index:60;width:260px;padding:12px;border-radius:12px;background:#0E0F13;border:1px solid var(--crimson);font-size:12px}
+#debug[hidden]{display:none}
+#debug h4{margin:0 0 8px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--crimson)}
+#debug label{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;color:var(--mute)}
+#debug input{width:96px;background:var(--surface-2);border:1px solid var(--line-2);border-radius:5px;padding:3px 6px}
+#debug .g{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+#debug button{padding:6px;border:1px solid var(--line-2);border-radius:6px;color:var(--text-2);font-size:11.5px;font-weight:600}
+#debug p{margin:6px 0 0;color:var(--mute-2)}
+
+/* ------------------------------------------------ responsive */
+@media (max-width:1060px){
+  .main{grid-template-columns:minmax(0,1fr) 360px}
+  .state-body{grid-template-columns:1fr}
+  .recgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:820px){
+  .main{grid-template-columns:minmax(0,1fr);padding:14px 16px 32px;gap:14px}
+  .col{display:contents}
+  #c-sit{order:1} #c-slip{order:2} #c-state{order:3} #c-ledger{order:4} #c-risk{order:5} #c-feed{order:6}
+  .moves,.moves.two{grid-template-columns:1fr}
+  .move{grid-template-columns:1fr auto;align-items:baseline}
+  .move .mk{grid-column:1/-1}
+  .state-body{grid-template-columns:1fr}
+  .top{flex-wrap:wrap;gap:8px 8px;padding:8px 16px}
+  .runtag{display:none}
+  .wallet{order:5;flex:1 1 100%}
+  .wallet > div{flex:1;padding:5px 12px}
+  .wallet .main{flex:1.6}
+  .wallet .main .v{font-size:19px}
+  .navbtn,.iconbtn{height:34px}
+  .iconbtn{width:34px}
+  .feed li{grid-template-columns:1fr;gap:2px}
+  .statgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .insight{grid-template-columns:1fr}
+  .recgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .behav{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ledger .hm{display:none}
+  .sheet{padding:22px 18px}
+  .arch{grid-template-columns:1fr}
+  .arch .prev{text-align:left}
+}
+@media (max-width:400px){
+  .preset b{font-size:13px}
+  .preset small{font-size:10.5px}
+  .brand b{letter-spacing:.14em}
+  .navbtn{padding:0 10px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;transition-duration:.05s!important}
+}
+</style>
+<style>
+  /* host reset — matches the environment the game was built in */
+  :root{ color-scheme: dark; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  html, body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="brand">
+    <svg width="26" height="22" viewBox="0 0 26 22" aria-hidden="true">
+      <path d="M3 19c2.4 0 3.7-3.8 4.1-8.4.2-2.7.4-6 .4-7.8M23 19c-2.4 0-3.7-3.8-4.1-8.4-.2-2.7-.4-6-.4-7.8" fill="none" stroke="#C8A64B" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M7.4 15.4 13 11l5.6 2.4" fill="none" stroke="#8E9AAF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="13" cy="11" r="1.7" fill="#ECE8E1"/>
+    </svg>
+    <b>GAMBU<i>LL</i></b>
+  </div>
+  <div class="runtag">Run <b id="t-run">#1</b> · Situation <b id="t-bet">1 / 15</b></div>
+  <div class="spacer"></div>
+  <div class="wallet" aria-label="Your pride">
+    <div class="main"><span class="k">Your pride</span><span class="v"><span id="w-bal">1,000</span><small>PRIDE</small></span><span class="delta" id="w-delta">±0 this climb</span></div>
+    <div><span class="k">Pride at risk</span><span class="v" id="w-risk">50</span></div>
+    <div><span class="k">If it lands</span><span class="v up" id="w-pot">+56</span></div>
+  </div>
+  <button class="navbtn" id="btn-records" type="button">My records</button>
+  <button class="iconbtn" id="btn-how" type="button" aria-label="How it works">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="8"/><path d="M7.9 7.7a2.2 2.2 0 1 1 3.2 2c-.7.4-1.1.9-1.1 1.7M10 14.2v.1" stroke-linecap="round"/></svg>
+  </button>
+  <button class="iconbtn" id="btn-sound" type="button" aria-label="Sound" aria-pressed="true">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 8h3l4-3.5v11L6 12H3z"/><path d="M13.5 7a4 4 0 0 1 0 6" stroke-linecap="round"/></svg>
+  </button>
+</header>
+
+<main class="main">
+  <div class="col">
+    <!-- ================= SITUATION ================= -->
+    <section class="card sit" id="c-sit" aria-label="Current situation">
+      <div class="card-h"><h2 id="sit-no">Situation 1 of 15</h2><span class="cat" id="sit-cat">Career</span></div>
+      <div class="sit-body">
+        <h3 class="sit-title" id="sit-title">The big pitch</h3>
+        <p class="sit-scene" id="sit-scene"></p>
+        <div class="scene" id="sit-art"></div>
+        <div class="signal" id="sit-signal"><span class="k">Signal</span><div><p id="sit-clue"></p><small>Signals are right about 70% of the time. The true edge is revealed after you bet.</small></div></div>
+        <div class="moves" id="moves" role="radiogroup" aria-label="Your move"></div>
+        <div class="sit-foot"><div class="turns" id="turns"></div><button class="pass" id="b-pass" type="button">Pass on this one</button></div>
+      </div>
+    </section>
+
+    <!-- ================= STATE ================= -->
+    <section class="card" id="c-state" aria-label="Your current state">
+      <div class="card-h"><h2>Your state</h2><span id="s-runinfo">Run #1</span></div>
+      <div class="state-body">
+        <div class="gauge">
+          <div class="cap">Current stature</div>
+          <svg viewBox="-10 -14 280 164" id="gauge" role="img" aria-label="Stature gauge"></svg>
+          <div class="read">
+            <div class="num" id="g-num">18</div>
+            <div class="bandlbl" id="g-band">Grounded</div>
+          </div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><span class="k">Payoff rate<small>at your current stake</small></span><span class="v" id="m-ret">1.12×</span></div>
+          <div class="metric"><span class="k">Exposure<small id="m-expnote">Few people are watching.</small></span><span class="v" id="m-vol">Low</span><div class="bar"><i id="b-vol"></i></div></div>
+          <div class="metric"><span class="k">Composure<small>feeds your skill influence</small></span><span class="v" id="m-comp">75%</span><div class="bar"><i id="b-comp"></i></div></div>
+          <div class="metric"><span class="k">Breaking point<small>hidden until you fall</small></span><span class="hidden-pill">Hidden</span></div>
+        </div>
+      </div>
+      <div class="observe" id="observe" aria-live="polite">
+        <span class="t" id="obs-t">Start</span>
+        <span class="m" id="obs-m">Pick a bet size. Small bets climb slowly and safely.<em id="obs-e"></em></span>
+      </div>
+    </section>
+
+    <!-- ================= LEDGER ================= -->
+    <section class="card" id="c-ledger" aria-label="Recent bets">
+      <div class="card-h"><h2>Recent moments</h2><span id="l-sum">0 bets</span></div>
+      <div class="ledger-wrap">
+        <table class="ledger">
+          <thead><tr><th>#</th><th>Situation · move</th><th>Staked</th><th class="hm">Stature</th><th class="hm">Decision</th><th>Result</th></tr></thead>
+          <tbody id="ledger"></tbody>
+        </table>
+        <div class="empty" id="l-empty">Nothing yet. Every situation you play lands here, with what it cost you and what it was really worth.</div>
+      </div>
+    </section>
+
+    <!-- ================= OBSERVATIONS ================= -->
+    <section class="card" id="c-feed" aria-label="Observations">
+      <div class="card-h"><h2>Observations</h2><span>What your betting is doing</span></div>
+      <ul class="feed" id="feed"></ul>
+    </section>
+  </div>
+
+  <div class="col">
+    <!-- ================= BET SLIP ================= -->
+    <section class="card slip" id="c-slip" aria-label="Bet slip">
+      <div class="card-h"><h2>Bet slip</h2><span id="slip-no">Bet #1</span></div>
+      <div class="lastres" id="lastres" hidden></div>
+      <div class="slip-body">
+        <div class="amt">
+          <button class="stepb" id="b-minus" type="button" aria-label="Lower bet">−</button>
+          <label class="amt-field"><input id="amt" type="number" inputmode="numeric" min="10" step="5" value="50" aria-label="Bet amount"><span>PRIDE</span></label>
+          <button class="stepb" id="b-plus" type="button" aria-label="Raise bet">+</button>
+        </div>
+        <input class="range" id="range" type="range" min="10" max="500" step="5" value="50" aria-label="Bet amount slider">
+        <div class="presets" id="presets"></div>
+
+        <div class="outcomes">
+          <div class="oc win"><div class="k">If it lands</div><div class="v" id="o-win">+56</div><div class="s" id="o-winr">+5 stature · pays 1.12×</div></div>
+          <div class="oc loss"><div class="k">If it flops</div><div class="v" id="o-loss">−50</div><div class="s" id="o-lossr">−2 stature · 5% of your pride</div></div>
+        </div>
+
+        <div class="lines">
+          <div class="line"><span class="k">Your move</span><span class="v" id="l-move">Balanced</span></div>
+          <div class="line"><span class="k">Your standing</span><span class="v" id="l-stat">18 · Unknown</span></div>
+          <div class="line" style="display:block">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span class="k">Pride at risk</span><span class="v"><span id="l-exp">5%</span><span class="chip" id="l-expc">Measured</span></span></div>
+            <div class="expbar" title="The white tick is the largest exposure that suits your current state"><i id="l-expbar"></i><u id="l-exprec"></u></div>
+          </div>
+          <div class="line"><span class="k">Success chance</span><span class="v" id="l-p">61%</span></div>
+          <div class="line" style="display:block">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span class="k">Skill influence</span><span class="v" id="l-skill">+6%</span></div>
+            <div class="skills" id="l-skills"></div>
+          </div>
+          <div class="line"><span class="k">Luck range</span><span class="v" id="l-luck">±7%</span></div>
+          <div class="line"><span class="k">Decision read</span><span class="v"><span class="dq Sound" id="l-dq">Sound</span></span></div>
+        </div>
+
+        <div class="total"><span class="k">Total at risk</span><span class="v" id="l-total">50 PRIDE</span></div>
+        <button class="place" id="b-place" type="button">Place bet</button>
+        <div class="secondary">
+          <button class="sec ground" id="b-ground2" type="button">Reset my ego</button>
+          <button class="sec" id="b-walk" type="button">Walk away</button>
+        </div>
+      </div>
+
+      <div class="resolve" id="resolve" hidden aria-live="assertive">
+        <div class="rs-head" id="rs-head">Bet placed</div>
+        <div class="rs-step" id="rs1"><span>At risk</span><b id="rs1v">50 PRIDE</b></div>
+        <div class="rs-step" id="rs2"><span>Chance for your move + skill</span><b id="rs2v">55% + 6%</b></div>
+        <div class="rs-step" id="rs3"><span>Luck</span><b id="rs3v">±0%</b></div>
+        <div class="rs-step" id="rs5"><span>Hidden edge</span><b id="rs5v">—</b></div>
+        <div class="rs-step" id="rs4"><span>Final odds</span><b id="rs4v">61%</b></div>
+        <div class="rs-out" id="rs-out"><div class="w">Outcome</div><div class="big" id="rs-big">Win</div><div class="amt2" id="rs-amt">+56 PRIDE</div><div class="story" id="rs-story"></div></div>
+        <div class="rs-dq" id="rs-dq">Decision <b id="rs-dqv">Sound</b> · <span id="rs-why">Good decision, luck agreed</span></div>
+        <button class="rs-cont" id="rs-cont" type="button">Continue<i></i></button>
+      </div>
+    </section>
+
+    <!-- ================= RISK MANAGEMENT ================= -->
+    <section class="card" id="c-risk" aria-label="Risk management">
+      <div class="card-h"><h2>Reset your ego</h2><div class="stones" id="stones" aria-label="Humble Stones"></div></div>
+      <div class="risk-body">
+        <p class="risk-lead"><b style="color:var(--text)">Step down a level.</b> You trade social height for control: exposure drops, composure returns, and the breaking point moves further away. Uses one Humble Stone — three per run, and you can't earn more.</p>
+        <div class="preview" id="g-preview"></div>
+        <button class="groundbtn" id="b-ground" type="button">Reset my ego · 1 stone</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- ================= OVERLAYS ================= -->
+<div class="overlay" id="ov-intro" hidden>
+  <div class="sheet intro" role="dialog" aria-modal="true" aria-labelledby="in-h">
+    <div class="word">GAMBU<i>LL</i></div>
+    <h1 id="in-h">How high can you climb?</h1>
+    <p class="tag">You don't gamble with money here. You gamble with pride — and the higher you get, the further there is to fall.</p>
+    <ul>
+      <li>You start with <b>1,000 Pride</b></li>
+      <li>Pride is standing, not money <b>confidence, status, face</b></li>
+      <li>15 social situations <b>different every run</b></li>
+      <li>Stake pride to be seen <b>up to everything you have</b></li>
+      <li>Winning buys height <b>Unknown → The top</b></li>
+      <li>Higher standing brings <b>more exposure</b></li>
+      <li>Not every room is worth it <b>you can pass</b></li>
+      <li>There is a breaking point <b>hidden from you</b></li>
+      <li>Cross it and you fall <b>back to zero, grounded</b></li>
+      <li>Three Humble Stones <b>to reset your ego</b></li>
+      <li>The real skill <b>leaving while you're on top</b></li>
+    </ul>
+    <div class="challenge" id="in-ch" hidden><div class="k">Your next challenge</div><p id="in-chp"></p><small id="in-chs"></small></div>
+    <div class="btns"><button class="btn-gold" id="b-start" type="button">Start run</button><button class="btn-line" id="b-in-rec" type="button">My records</button></div>
+    <p class="fine">Pride is a fictional measure of standing, not money. No deposits, purchases, cash value or prizes. Nothing is rigged against you: every outcome comes from the published odds plus a seeded luck draw.</p>
+  </div>
+</div>
+
+<div class="overlay" id="ov-how" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="how-h">
+    <button class="x" data-close type="button" aria-label="Close">×</button>
+    <span class="eyebrow">How outcomes are decided</span>
+    <h2 id="how-h">How the climb works.</h2>
+    <div class="kv">
+      <div><span class="k">Situation</span><span class="v">Each has a hidden edge: +8%, 0 or −8%</span></div>
+      <div><span class="k">Signal</span><span class="v">Points at the true edge ~70% of the time</span></div>
+      <div><span class="k">Safer move</span><span class="v">+10% chance, 0.55× the return</span></div>
+      <div><span class="k">All-in move</span><span class="v">−8% chance, 1.6× return, faster Stature</span></div>
+      <div><span class="k">Ego traps</span><span class="v">Appear once you are high; usually a bad edge</span></div>
+      <div><span class="k">Base chance</span><span class="v">Falls as your standing and your stake rise</span></div>
+      <div><span class="k">Skill influence</span><span class="v">−12% to +10%, from your decisions</span></div>
+      <div><span class="k">Luck</span><span class="v">A seeded draw inside the luck range</span></div>
+      <div><span class="k">Return</span><span class="v">Grows with Stature and bet size</span></div>
+      <div><span class="k">Winning</span><span class="v">Buys height. Bigger stakes climb faster</span></div>
+      <div><span class="k">The fall</span><span class="v">Cross the breaking point and every token goes. Back to zero.</span></div>
+    </div>
+    <h3>What counts as skill</h3>
+    <div class="kv">
+      <div><span class="k">Bet sized for your state</span><span class="v up">up to +3%</span></div>
+      <div><span class="k">Composure</span><span class="v up">up to +4%</span></div>
+      <div><span class="k">Consistent sizing</span><span class="v up">+2%</span></div>
+      <div><span class="k">Stepping back after a close call</span><span class="v up">+2%</span></div>
+      <div><span class="k">Playing your move to the signal</span><span class="v up">+2%</span></div>
+      <div><span class="k">Going all in against a warning sign</span><span class="v down">−3%</span></div>
+      <div><span class="k">Oversized for your state</span><span class="v down">−4%</span></div>
+      <div><span class="k">Raising after a loss</span><span class="v down">−4%</span></div>
+      <div><span class="k">Escalating on a streak</span><span class="v down">−3%</span></div>
+    </div>
+    <p class="fine">The engine never looks at whether you're winning, losing, about to quit or low on pride. Decision quality is graded separately from the result, so a good call can lose and a reckless one can win.</p>
+  </div>
+</div>
+
+<div class="overlay" id="ov-ground" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="gr-h">
+    <button class="x" data-close type="button" aria-label="Close">×</button>
+    <span class="eyebrow">Risk management</span>
+    <h2 id="gr-h">Reset your ego?</h2>
+    <p class="lead">You give up height and momentum. In exchange, fewer people are watching, your composure comes back, and the breaking point moves further away.</p>
+    <div class="preview" id="gr-preview" style="margin-top:16px"></div>
+    <div class="btns"><button class="btn-steel" id="b-gr-yes" type="button">Reset · use 1 stone</button><button class="btn-line" data-close type="button">Keep climbing</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-walk" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="wk-h">
+    <button class="x" data-close type="button" aria-label="Close">×</button>
+    <span class="eyebrow">End this run</span>
+    <h2 id="wk-h">Walk away while you're on top?</h2>
+    <div class="kv" id="wk-kv"></div>
+    <div class="btns"><button class="btn-gold" id="b-wk-yes" type="button">Walk away</button><button class="btn-line" data-close type="button">Keep climbing</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-summary" hidden>
+  <div class="sheet wide" role="dialog" aria-modal="true" aria-labelledby="su-h" id="su-sheet"></div>
+</div>
+
+<div class="overlay" id="ov-records" hidden>
+  <div class="sheet wide" role="dialog" aria-modal="true" aria-labelledby="rc-h">
+    <button class="x" data-close type="button" aria-label="Close">×</button>
+    <span class="eyebrow">My records</span>
+    <h2 id="rc-h">Your play, on file.</h2>
+    <div id="rc-body"></div>
+  </div>
+</div>
+
+<div class="round" id="mo-round" hidden>
+  <span class="rk" id="ro-k">Round 1 of 3</span>
+  <h2 id="ro-name">The room</h2>
+  <p id="ro-sub">Nobody here knows you yet.</p>
+  <div class="note" id="ro-note"></div>
+  <div class="bar"><i></i></div>
+</div>
+
+<div class="moment" id="mo-sig" hidden>
+  <div class="num" id="sig-num">72</div>
+  <h2>You feel in control.</h2>
+  <p id="sig-p">That's the dangerous part.</p>
+</div>
+
+<div class="moment crash" id="mo-crash" hidden>
+  <div class="num" id="cr-num">76</div>
+  <h2>You fell.</h2>
+  <div class="sub" id="cr-sub"></div>
+  <div class="btns" id="cr-btns"><button class="btn-gold" id="b-cr-go" type="button">See run analysis</button></div>
+</div>
+
+<div id="debug" hidden>
+  <h4>Dev panel · press ` to close</h4>
+  <label>Seed <input id="d-seed"></label>
+  <label>Wallet <input id="d-wallet" type="number"></label>
+  <label>Stature <input id="d-stat" type="number"></label>
+  <label>Composure <input id="d-comp" type="number"></label>
+  <label>Crash point <input id="d-crash" type="number"></label>
+  <label>Force luck (±%) <input id="d-luck" type="number" placeholder="off"></label>
+  <div class="g">
+    <button data-d="apply" type="button">Apply</button>
+    <button data-d="win" type="button">Next = win</button>
+    <button data-d="loss" type="button">Next = loss</button>
+    <button data-d="near" type="button">Near miss</button>
+    <button data-d="event" type="button">Event</button>
+    <button data-d="sig" type="button">Signature</button>
+    <button data-d="crash" type="button">Crash</button>
+    <button data-d="reset" type="button">Reset run (seed)</button>
+  </div>
+  <p id="d-info"></p>
+</div>
+
+<script>
+'use strict';
+/* =============================================================================
+   GAMBULL — bet-slip build
+   Module map (one file, same seams as the requested src/ tree):
+     CONFIG              every tunable number
+     rng                 seedable mulberry32 with serialisable state
+     StatureEngine       bands
+     VolatilityEngine    volatility from stature
+     ComposureEngine     composure deltas
+     RiskEngine          exposure + categories + recommended exposure
+     RewardEngine        return rate
+     OutcomeEngine       base chance + skill influence + luck draw → result
+     DecisionEngine      decision quality (graded apart from the outcome)
+     BetEngine           limits + presets
+     EventEngine         behavioural observations + mirror events
+     NearMissEngine      close-call detection (never forced)
+     ArchetypeEngine     play-pattern classification, evolving over runs
+     RecordEngine        personal records
+     ChallengeEngine     next-run challenge from your own history
+     Game                run state machine
+     services            playerService / runService / recordService / analyticsService
+                         over ONE adapter (LocalAdapter). See SERVER NOTES.
+     view                DOM rendering + resolution sequence
+   Fairness: no function reads wallet trend, session length, recent crashes or
+   quit intent when deciding an outcome. Only the documented inputs do.
+============================================================================= */
+const CONFIG = {
+  startWallet: 1000, minBet: 10, maxExposure: 1,
+  startStature: 18, startComposure: 75, stones: 3,
+  crash: { min: 62, max: 92 },
+  bands: [[0,'Unknown','#8E9AAF'],[25,'Noticed','#D9A23A'],[50,'Recognized','#DB7A34'],[70,'Prominent','#D2455A'],[85,'Influential','#A5283C'],[95,'The top','#8E1B33']],
+  exposureBands: [[0,'Controlled','#4FB286'],[.05,'Measured','#8E9AAF'],[.12,'Aggressive','#D9A23A'],[.25,'Dangerous','#DB7A34'],[.4,'Extreme','#D2455A']],
+  reward:   { base: .80, stature: 1.5, exposure: 1.0 },
+  odds:     { base: .60, stature: .36, staturePow: 1.4, exposure: .30, min: .08, max: .90 },
+  luck:     { base: 5, perVol: .25, max: 20 },
+  vol:      { base: 8, k: 50 },
+  stature:  { winBase: 3, winPerExposure: 40, loss: 2, floor: 5 },
+  composure:{ winBase: 2, winPerExposure: 10, loss: 6, chase: 6, nearMiss: 8, ground: 30, strong: 3 },
+  recExposure: { at0: .22, drop: .17 },
+  skill:    { sized: 3, oversized: -4, composureDiv: 8, composureCap: 4, consistent: 2, chase: -4, escalate: -3, stepBack: 2, min: -12, max: 10 },
+  ground:   { keep: .55 },
+  nearMissWindow: 3,
+  crashPenalty: 1,
+  signatureAt: 70,
+  presets: [10, 25, 50, 100],
+  situation: { turns: 15, clueAccuracy: .70, edge: 8, temptationMin: 45, reflectGap: 4, reflectChance: .32, passComposure: 3 },
+  rounds: [
+    { n:1, name:'The room',      sub:'Nobody here knows you yet.',        note:'Small rooms, small stakes. Get noticed.',            turns:5, payoff:1.00 },
+    { n:2, name:'The circle',    sub:'People are starting to notice you.', note:'Bigger rooms. Payoffs rise by 15%.',                turns:5, payoff:1.15 },
+    { n:3, name:'The spotlight', sub:'Everyone is watching now.',          note:'Payoffs rise by 30% — and the ego traps come out.', turns:5, payoff:1.30 }
+  ],
+  moves: {
+    safe:  { odds: .10, rate: .55, stature: .5, name:'Safer' },
+    bold:  { odds: 0,   rate: 1,   stature: 1,  name:'Balanced' },
+    allin: { odds: -.08, rate: 1.6, stature: 1.5, name:'All in' }
+  }
+};
+
+/* ------------------------------------------------------------ situations
+   clues: what the Signal line says when the true edge is good / neutral / bad.
+   opts:  [safer, balanced, all-in] labels. */
+const S = (id, cat, w, min, title, scene, good, neutral, bad, opts, win, loss) => ({ id, cat, w, min, title, scene, clues:{ good, neutral, bad }, opts, win, loss });
+const CAT_LABEL = { Stage:'Stage', Work:'Work', Social:'Social', Online:'Online', Arena:'Arena', Circle:'Your circle', Trap:'Ego trap' };
+const SITUATIONS = [
+  S('openmic','Stage',3,0,'The open mic','You\u2019re at an event where nobody knows you. The host asks if anyone wants five minutes.',
+    'The room already laughed at the host\u2019s warm-up.','People are still finding their seats.','The last person to try got polite silence.',
+    ['Introduce yourself from your seat','Take the five minutes','Take the stage and go long'],
+    'People ask your name afterwards.','You lose the room halfway and feel every second of it.'),
+  S('present','Work',3,0,'The presentation','Your manager asks who wants to present the idea to senior leadership. Nobody moves.',
+    'Two people already told you the idea is good.','It\u2019s a normal room on a normal Tuesday.','The last person who volunteered got picked apart.',
+    ['Offer to help whoever does it','Volunteer to present','Volunteer and promise the numbers'],
+    'You become the person behind the idea.','It goes badly, in front of everyone who matters.'),
+  S('party','Social',3,0,'The dance floor','Someone pulls you towards the floor. Your friends are watching from the table.',
+    'Your song just came on.','The floor is half full.','Somebody is filming everything tonight.',
+    ['Stay near the table','Step out for one song','Take the middle of the circle'],
+    'The circle opens up for you.','The circle closes, and nobody meets your eye.'),
+  S('debate','Circle',3,0,'The disagreement','Someone contradicts you loudly and the table goes quiet.',
+    'You have the facts and they know it.','It could go either way.','They\u2019ve been doing this far longer than you.',
+    ['Let it go','Defend your position','Take them apart in front of everyone'],
+    'The table comes round to you.','You become the one who couldn\u2019t let it go.'),
+  S('post','Online',3,0,'The post you almost deleted','It\u2019s written. Your thumb is over the button.',
+    'A big account replied to your last one.','It\u2019s a quiet evening online.','People are already arguing about this today.',
+    ['Send it to the group chat','Post it publicly','Post it with the boldest line first'],
+    'It travels further than anything you\u2019ve posted.','The replies are worse than the silence would have been.'),
+  S('volunteer','Work',3,0,'Someone has to volunteer','Everyone has already said no. The silence is getting long.',
+    'You\u2019ve done something like this before.','Nobody knows quite what it involves.','The last person who ran it quietly left.',
+    ['Offer to assist','Put your hand up','Put your hand up and promise more'],
+    'It works, and everyone knows whose hand went up.','It doesn\u2019t, and everyone knows whose hand went up.'),
+  S('karaoke','Stage',3,0,'The karaoke list','The bar is packed and the sign-up sheet reaches you.',
+    'The last three singers were worse than you.','Nobody is really listening yet.','Someone just nailed the one song you know.',
+    ['Sing something safe','Sing the one you love','Take the song everybody knows'],
+    'The whole bar sings the chorus with you.','You hear yourself over the speakers, and so does everyone else.'),
+  S('opinion','Circle',3,0,'Nobody asked for your opinion','There\u2019s a gap in the conversation. You could fill it.',
+    'You actually know this subject.','Everyone is half listening.','The person talking knows more than you do.',
+    ['Stay quiet','Say the short version','Take over the conversation'],
+    'The conversation turns your way.','Someone says \u201canyway\u201d and carries on.'),
+  S('photo','Circle',2,0,'The group photo','You\u2019re at the edge of the frame. There\u2019s room in the middle.',
+    'Someone already waved you in.','Everyone is still shuffling around.','The middle is taken, and they know it.',
+    ['Stay at the edge','Move in','Take the middle and the caption'],
+    'You\u2019re in the photo everyone posts.','You\u2019re the one being asked to move.'),
+  S('lastover','Arena',2,0,'The last over','Your team needs eleven and the bat is in your hands. The whole ground is watching.',
+    'You middled the last two.','The light is starting to go.','Your timing has been off all evening.',
+    ['Play for singles','Swing at the loose ones','Go for six every ball'],
+    'You finish it, and they carry you off.','First ball. They\u2019ll bring it up for years.'),
+  S('lift','Arena',2,0,'The lift everyone is watching','There\u2019s a crowd at the rack and your friend has their phone out.',
+    'Your warm-ups moved fast.','It\u2019s an ordinary session.','Your back has been off since Tuesday.',
+    ['Add a small plate','Go for your best','Go well past your best'],
+    'It goes up clean, and the video goes around.','It doesn\u2019t move, and the video still goes around.'),
+  S('defend','Circle',2,0,'Defending a friend','Someone is making your friend the joke of the table.',
+    'Others look uncomfortable too.','It\u2019s borderline.','Your friend is laughing along with it.',
+    ['Change the subject','Say something','Turn it into a confrontation'],
+    'It stops, and your friend remembers who stopped it.','You make it bigger, and it lands on you.'),
+  S('speech','Stage',2,20,'The wedding speech','Two hundred people, one microphone, and your name has just been called.',
+    'Your opening line already got a laugh at the rehearsal.','It\u2019s a warm crowd, mostly family.','The speaker before you left everyone in tears.',
+    ['Keep it short and kind','Tell the long story','Improvise a roast'],
+    'They\u2019re quoting you at the bar all night.','It dies in the middle. You finish anyway.'),
+  S('ask','Social',2,25,'Asking in front of everyone','You could ask them out right here, with your friends at the next table.',
+    'They laughed at everything you said tonight.','It\u2019s been a good evening.','They\u2019ve been on their phone since you sat down.',
+    ['Ask quietly, later','Ask now, simply','Make it a scene'],
+    'They say yes, and the table cheers.','You get your answer, and so does the table.'),
+  S('laughing','Circle',2,25,'They\u2019re laughing','You can\u2019t tell whether it\u2019s with you.',
+    'Someone just repeated your line.','It\u2019s a loud table.','They stopped when you looked over.',
+    ['Let it pass','Ask what\u2019s funny','Make a bigger joke over the top'],
+    'It was with you \u2014 and now it definitely is.','You find out it wasn\u2019t.'),
+  S('reunion','Social',2,30,'The reunion','People you haven\u2019t seen in ten years want to know what you\u2019ve become.',
+    'You genuinely like where you are.','Everyone is exaggerating a little.','Someone here already knows the real version.',
+    ['Keep it modest','Tell it properly','Tell the bigger version'],
+    'You leave as the one who did well.','The bigger version doesn\u2019t survive the evening.'),
+  S('invite','Social',2,30,'\u201cYou should come with us\u201d','Someone important says it on the way out. You don\u2019t know exactly where they\u2019re going.',
+    'They said your name to the others first.','It\u2019s a big group.','Nobody has told you who else is going.',
+    ['Say you\u2019ll catch up later','Go along','Go, and offer to speak for the group'],
+    'You end the night in the middle of the room.','You spend the night standing just outside it.'),
+  S('live','Online',2,35,'Going live','You could start a live right now. Forty people would see it instantly.',
+    'Your last one held its audience.','It\u2019s an ordinary evening.','You have nothing prepared.',
+    ['Post a story instead','Go live for ten minutes','Go live and promise something big'],
+    'The number in the corner keeps climbing.','It drops to four people, and you can see exactly who.'),
+  S('seconds','Work',2,35,'Thirty seconds to answer','A senior person asks you a direct question in front of the room.',
+    'It\u2019s the part you prepared.','It\u2019s a fair question.','You don\u2019t actually know.',
+    ['Say you\u2019ll follow up','Answer straight','Answer big and commit to it'],
+    'They nod, and they remember it.','The follow-up question finds the gap.'),
+  S('hottake','Online',2,40,'The hot take','Something is trending and you have an opinion nobody asked for.',
+    'You\u2019ve been right about this before.','Everyone is posting anyway.','The people arguing are better at this than you.',
+    ['Post something measured','Post the take','Post the take and tag them'],
+    'It ages well, publicly.','Screenshots of it are already going round.'),
+  S('expert','Work',2,45,'\u201cOur expert will explain\u201d','They just introduced you as the expert. You are not, entirely.',
+    'You know the first half cold.','The questions haven\u2019t started yet.','The actual expert is in the second row.',
+    ['Say what you actually know','Take the whole explanation','Answer everything, confidently'],
+    'You hold it, and the title sticks.','One question opens the floor beneath you.'),
+  S('mentor','Work',2,50,'The mentor slot','They ask you to run the session for the people who are new.',
+    'You know exactly what they need to hear.','You have a week to prepare.','You\u2019d be teaching something you learned last month.',
+    ['Co-run it with someone','Run it','Run it and open with your own story'],
+    'Three of them ask to stay in touch.','Someone asks a basic question you can\u2019t answer.'),
+  S('recognized','Social',2,50,'Someone recognizes you','Across the room, someone says your name to the person next to them.',
+    'They\u2019re smiling.','You can\u2019t hear what was said.','They\u2019re laughing at something.',
+    ['Nod and stay where you are','Walk over','Walk over and hold the room'],
+    'You leave with three new people who know you.','It turns out they were talking about someone else.'),
+  S('stage','Stage',2,45,'The bigger stage','The organizer offers you the main slot instead of the small room.',
+    'Your small-room session was full.','Both rooms would be fine.','The main slot follows someone very good.',
+    ['Keep the small room','Take the main slot','Take it and promise something new'],
+    'You fill it, and they ask you back.','You watch people leave in the middle.'),
+  S('challenge','Trap',2,40,'\u201cI don\u2019t think you can do it\u201d','Someone says it with a smile. Everyone hears it.',
+    'You\u2019ve done this before and they haven\u2019t.','It\u2019s mostly a joke.','They\u2019re setting you up, and you can feel it.',
+    ['Laugh it off','Take the challenge','Raise the stakes yourself'],
+    'You prove it, and the room enjoys it.','You prove their point instead.'),
+  S('credit','Trap',2,45,'The wrong person is thanked','Someone credits you, in public, for work that wasn\u2019t only yours.',
+    'You did carry most of it.','It was a group effort.','The person who did the work is in the room.',
+    ['Correct them','Say nothing','Add a detail to make it yours'],
+    'Nobody questions it.','Somebody does, and the room hears it.'),
+  S('heckler','Trap',2,50,'The heckler','Someone at the back has decided to make tonight about them.',
+    'The crowd is on your side.','It\u2019s one voice.','They\u2019re funnier than you are tonight.',
+    ['Ignore it','One clean line back','Go after them properly'],
+    'The room turns on them, not you.','You become the one who couldn\u2019t handle it.'),
+  S('encore','Trap',2,55,'One more encore','You already had your moment tonight. They\u2019re still chanting.',
+    'You\u2019ve got one more in you.','They haven\u2019t stopped yet.','Your voice is gone and you know it.',
+    ['Take the applause and go','One short encore','A whole second set'],
+    'They remember the second one even more.','The room thins out while you\u2019re still up there.'),
+  S('rival','Trap',2,60,'The public challenge','A rival names you in front of everyone and asks you to prove it.',
+    'You beat them last time.','The crowd is enjoying this.','They have clearly prepared for this.',
+    ['Decline gracefully','Accept','Accept and raise it'],
+    'You win, and everyone saw.','You lose, and everyone saw.'),
+  S('tablejoke','Circle',3,0,'The joke at your expense','Someone makes you the punchline. The table waits to see what you do.',
+    'They like you \u2014 it was affectionate.','It\u2019s a mild one.','They\u2019ve been circling this all night.',
+    ['Laugh with them','Fire one back','Turn the whole table on them'],
+    'You get the bigger laugh.','You look like someone who couldn\u2019t take it.'),
+  S('groupchat','Online',2,20,'The group chat argument','Forty people are in it, two of them are wrong, and everyone can see you typing.',
+    'You have the screenshot that settles it.','Everyone is half joking.','The loudest one is your friend\u2019s brother.',
+    ['Reply privately','Say your piece','Settle it publicly, with receipts'],
+    'The chat agrees and moves on.','You become the thread nobody wants to open.'),
+  S('intro','Social',2,25,'Introducing yourself','A circle of people you\u2019ve never met opens slightly as you walk up.',
+    'One of them has heard of you.','They\u2019re mid-conversation.','They were clearly talking about something private.',
+    ['Listen first','Introduce yourself','Take it over with a story'],
+    'You\u2019re part of the circle by the end of the night.','The circle closes again behind you.'),
+  S('award','Stage',2,60,'The award you didn\u2019t win','Your name isn\u2019t called. The camera finds you anyway.',
+    'You genuinely liked the winner\u2019s work.','Everyone is clapping.','You had already written the speech.',
+    ['Clap, and mean it','Congratulate them on stage','Say what you really think, after'],
+    'The clip of your reaction does more for you than the award would have.','The clip of your face goes round instead.'),
+  S('interview','Online',2,65,'Live, no edit','It goes out unedited, and the host enjoys a difficult question.',
+    'You\u2019ve done this before.','It\u2019s a friendly show.','They opened with the thing you don\u2019t discuss.',
+    ['Stay on safe ground','Answer honestly','Say something they\u2019ll quote'],
+    'The quote goes round, in your favour.','The quote goes round.'),
+  S('keynote','Stage',2,70,'The keynote','A thousand seats, and your name on the screen behind you.',
+    'You\u2019ve given this talk twice and it lands.','It\u2019s a big, patient room.','You rewrote the whole thing last night.',
+    ['Give the talk you\u2019ve given before','Give the new version','Open with something unrehearsed'],
+    'Standing ovation, and three conversations waiting at the exit.','Polite applause, and a long walk off.'),
+  S('next','Trap',1,75,'\u201cSo what\u2019s next?\u201d','You\u2019ve never had this much attention. Someone asks, and the room leans in.',
+    'You actually have a next thing.','You could buy yourself some time.','You have nothing, and they can tell.',
+    ['Say you\u2019re still working on it','Announce the next thing','Announce something you haven\u2019t built'],
+    'The room believes you \u2014 so now it\u2019s real.','You\u2019ve promised something that doesn\u2019t exist.')
+];
+const REFLECTIONS = [
+  { id:'changed', title:'\u201cYou\u2019ve changed\u201d', scene:'A friend says it over dinner. Not angry. Tired.',
+    choices:[['Listen properly', -6, 15], ['Tell them they\u2019re imagining it', 4, -6]] },
+  { id:'uninvited', title:'Nobody invited you', scene:'The photos went up this morning. You weren\u2019t in them.',
+    choices:[['Ask them about it', -4, 12], ['Post something better', 5, -7]] },
+  { id:'likes', title:'You check again', scene:'Fourth time in ten minutes. The number has barely moved.',
+    choices:[['Put the phone down', -3, 10], ['Refresh once more', 3, -6]] },
+  { id:'filmed', title:'Someone is filming you', scene:'They didn\u2019t ask. The camera is already up.',
+    choices:[['Ask them to stop', -5, 12], ['Perform for it', 6, -8]] },
+  { id:'oldfriend', title:'An old friend calls', scene:'Not about any of this. They just want to talk.',
+    choices:[['Talk for an hour', -4, 12], ['Keep it short, you\u2019re busy', 4, -6]] },
+  { id:'samestory', title:'The same story again', scene:'You\u2019re halfway through before you notice they\u2019ve heard it.',
+    choices:[['Stop and ask about them', -6, 12], ['Tell it bigger this time', 6, -8]] }
+];
+/* which round each situation belongs to, and which scene illustrates it */
+const ROUND_OF = {
+  openmic:1, present:1, party:1, debate:1, post:1, volunteer:1, karaoke:1, opinion:1, photo:1, lastover:1, lift:1, defend:1, tablejoke:1,
+  speech:2, ask:2, laughing:2, reunion:2, invite:2, live:2, seconds:2, hottake:2, mentor:2, recognized:2, groupchat:2, intro:2,
+  expert:3, stage:3, challenge:3, credit:3, heckler:3, encore:3, rival:3, next:3, award:3, interview:3, keynote:3
+};
+const SCENE_OF = {
+  openmic:'stage', karaoke:'stage', speech:'stage', keynote:'podium', award:'podium', stage:'podium',
+  party:'crowd', intro:'crowd', recognized:'crowd', invite:'door',
+  post:'phone', hottake:'phone', groupchat:'phone', live:'stream', interview:'camera',
+  present:'room', volunteer:'room', seconds:'room', expert:'room', mentor:'room',
+  lastover:'field', lift:'gym', photo:'frame', ask:'pair',
+  debate:'table', opinion:'table', tablejoke:'table', laughing:'table', defend:'table', reunion:'table',
+  challenge:'podium', credit:'room', heckler:'stage', encore:'stage', rival:'podium', next:'camera',
+  changed:'table', uninvited:'phone', likes:'phone', filmed:'camera', oldfriend:'pair', samestory:'table'
+};
+const SIT_BY_ID = Object.fromEntries(SITUATIONS.map(s => [s.id, s]));
+const REF_BY_ID = Object.fromEntries(REFLECTIONS.map(s => [s.id, s]));
+const MOVE_KEYS = ['safe', 'bold', 'allin'];
+
+
+/* ------------------------------------------------------ scene artwork
+   Hand-built SVG scenes, one per situation family, tinted by category.
+   Everything is inline: no external images, so it works offline too. */
+const CAT_ACCENT = { Stage:'#E2C677', Work:'#7F97C9', Social:'#D9A23A', Online:'#4FB286', Arena:'#DB7A34', Circle:'#9AA7C4', Trap:'#D2455A', Reflection:'#7F97C9' };
+const DIM = '#2A3242', MID = '#3E4961', LIGHT = '#59657F';
+function person(x, y, sc, f, arm){
+  const hr = 5 * sc, bh = 15 * sc, bw = 13 * sc, headY = y - bh - hr - 2 * sc;
+  return '<g fill="' + f + '">' +
+    '<circle cx="' + x + '" cy="' + headY.toFixed(1) + '" r="' + hr.toFixed(1) + '"/>' +
+    '<path d="M' + (x - bw / 2).toFixed(1) + ' ' + y + ' v' + (-(bh - bw / 2)).toFixed(1) + ' a' + (bw / 2).toFixed(1) + ' ' + (bw / 2).toFixed(1) + ' 0 0 1 ' + bw.toFixed(1) + ' 0 v' + (bh - bw / 2).toFixed(1) + ' z"/>' +
+    (arm ? '<rect x="' + (x + bw / 2 - 1).toFixed(1) + '" y="' + (y - bh - 4 * sc).toFixed(1) + '" width="' + (2.4 * sc).toFixed(1) + '" height="' + (13 * sc).toFixed(1) + '" rx="1.2" transform="rotate(30 ' + (x + bw / 2).toFixed(1) + ' ' + (y - bh).toFixed(1) + ')"/>' : '') +
+    '</g>';
+}
+function crowdRow(y, n, x0, gap, f, sc){
+  let o = '';
+  for (let i = 0; i < n; i++) o += person(x0 + i * gap, y, sc, f);
+  return o;
+}
+const SCENE_LIB = {
+  stage(a){ return '<defs><linearGradient id="sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + a + '" stop-opacity=".30"/><stop offset="1" stop-color="' + a + '" stop-opacity="0"/></linearGradient></defs>' +
+    '<path class="sway" d="M196 6 L150 132 H262 L212 6 Z" fill="url(#sp)"/>' +
+    '<circle cx="204" cy="8" r="5" fill="' + a + '"/>' +
+    '<rect x="70" y="118" width="280" height="3" rx="1.5" fill="' + MID + '"/>' +
+    person(204, 118, 1.5, a) +
+    '<rect x="222" y="86" width="2" height="32" fill="' + LIGHT + '"/><circle cx="223" cy="84" r="4" fill="' + LIGHT + '"/>' +
+    crowdRow(146, 9, 40, 42, DIM, 1.15); },
+  podium(a){ return '<defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + a + '" stop-opacity=".22"/><stop offset="1" stop-color="' + a + '" stop-opacity="0"/></linearGradient></defs>' +
+    '<rect x="96" y="14" width="228" height="56" rx="4" fill="#12161F" stroke="' + MID + '"/>' +
+    '<rect x="112" y="30" width="120" height="5" rx="2.5" fill="' + a + '" opacity=".75"/>' +
+    '<rect x="112" y="44" width="180" height="4" rx="2" fill="' + MID + '"/>' +
+    '<path class="sway" d="M150 0 L118 104 H200 L182 0 Z" fill="url(#pg)"/>' +
+    '<path class="sway2" d="M270 0 L238 104 H320 L302 0 Z" fill="url(#pg)"/>' +
+    '<rect x="60" y="104" width="300" height="4" rx="2" fill="' + MID + '"/>' +
+    person(210, 104, 1.4, a) +
+    '<rect x="196" y="90" width="30" height="18" rx="2" fill="#12161F" stroke="' + LIGHT + '"/>' +
+    crowdRow(132, 11, 26, 37, DIM, 1) + crowdRow(150, 12, 8, 37, '#1E2531', 1.15); },
+  crowd(a){ let o = '<ellipse cx="210" cy="118" rx="150" ry="22" fill="none" stroke="' + DIM + '" stroke-dasharray="4 5"/>';
+    const ring = [[90,112,1.15],[140,124,1.25],[210,130,1.3],[282,124,1.25],[332,112,1.15],[120,96,1],[300,96,1]];
+    ring.forEach(p => { o += person(p[0], p[1], p[2], DIM); });
+    o += person(210, 104, 1.45, a);
+    o += '<circle cx="210" cy="104" r="40" fill="' + a + '" opacity=".07"/>';
+    return o; },
+  table(a){ return '<path class="sway" d="M186 0 v26 M234 0 v26" stroke="' + MID + '" stroke-width="2"/>' +
+    '<ellipse cx="210" cy="30" rx="26" ry="7" fill="' + a + '" opacity=".22"/>' +
+    '<ellipse cx="210" cy="96" rx="132" ry="30" fill="#12161F" stroke="' + MID + '"/>' +
+    '<ellipse cx="210" cy="92" rx="132" ry="30" fill="#161B26" stroke="' + LIGHT + '" stroke-opacity=".4"/>' +
+    [130,175,245,290].map(x => '<rect x="' + x + '" y="80" width="7" height="12" rx="2" fill="' + LIGHT + '" opacity=".6"/>').join('') +
+    person(96, 78, 1.15, DIM) + person(152, 70, 1.05, DIM) + person(268, 70, 1.05, DIM) + person(324, 78, 1.15, DIM) +
+    person(210, 66, 1.2, a); },
+  room(a){ return '<rect x="252" y="16" width="140" height="74" rx="4" fill="#12161F" stroke="' + MID + '"/>' +
+    '<rect x="266" y="62" width="14" height="16" fill="' + a + '" opacity=".8"/><rect x="288" y="48" width="14" height="30" fill="' + a + '" opacity=".6"/>' +
+    '<rect x="310" y="36" width="14" height="42" fill="' + a + '" opacity=".9"/><rect x="332" y="54" width="14" height="24" fill="' + a + '" opacity=".5"/>' +
+    '<rect x="266" y="28" width="60" height="4" rx="2" fill="' + MID + '"/>' +
+    '<rect x="24" y="92" width="210" height="34" rx="6" fill="#161B26" stroke="' + MID + '"/>' +
+    person(60, 90, 1.1, DIM) + person(112, 90, 1.1, DIM) + person(164, 90, 1.1, DIM) + person(214, 90, 1.1, DIM) +
+    person(292, 120, 1.4, a, 1); },
+  phone(a){ return '<rect x="150" y="10" width="120" height="132" rx="14" fill="#12161F" stroke="' + LIGHT + '"/>' +
+    '<rect x="150" y="10" width="120" height="132" rx="14" fill="' + a + '" opacity=".05"/>' +
+    '<circle cx="176" cy="36" r="9" fill="' + a + '" opacity=".8"/>' +
+    '<rect x="192" y="30" width="54" height="5" rx="2.5" fill="' + MID + '"/><rect x="192" y="41" width="34" height="4" rx="2" fill="' + DIM + '"/>' +
+    '<rect x="164" y="58" width="92" height="42" rx="5" fill="#0E121A" stroke="' + DIM + '"/>' +
+    '<rect x="164" y="108" width="70" height="5" rx="2.5" fill="' + MID + '"/><rect x="164" y="120" width="46" height="5" rx="2.5" fill="' + DIM + '"/>' +
+    '<g fill="' + a + '"><path class="rise1" d="M106 96 a7 7 0 0 1 12-4 7 7 0 0 1 12 4c0 8-12 14-12 14s-12-6-12-14z" opacity=".85"/>' +
+    '<circle class="rise2" cx="300" cy="86" r="7" opacity=".7"/><circle class="rise3" cx="322" cy="112" r="4.5" opacity=".5"/></g>'; },
+  stream(a){ return '<rect x="86" y="22" width="248" height="94" rx="8" fill="#12161F" stroke="' + MID + '"/>' +
+    '<rect x="96" y="32" width="228" height="74" rx="4" fill="#0E121A"/>' +
+    person(210, 100, 1.35, a) +
+    '<g><circle class="blink" cx="116" cy="46" r="5" fill="#D2455A"/><rect x="128" y="41" width="26" height="9" rx="2" fill="' + MID + '"/></g>' +
+    '<rect x="252" y="41" width="60" height="9" rx="4" fill="' + a + '" opacity=".55"/>' +
+    '<rect x="150" y="124" width="120" height="8" rx="4" fill="' + MID + '"/>' +
+    '<rect x="150" y="124" width="74" height="8" rx="4" fill="' + a + '"/>'; },
+  camera(a){ return '<rect x="60" y="54" width="86" height="52" rx="6" fill="#12161F" stroke="' + LIGHT + '"/>' +
+    '<circle cx="104" cy="80" r="17" fill="#0E121A" stroke="' + a + '" stroke-width="2"/><circle class="pulse" cx="104" cy="80" r="8" fill="' + a + '" opacity=".6"/>' +
+    '<path d="M146 66 l26 -12 v52 l-26 -12 z" fill="' + MID + '"/>' +
+    '<path d="M104 106 l-22 36 h44 z" fill="' + MID + '"/>' +
+    '<circle class="blink" cx="136" cy="62" r="4" fill="#D2455A"/>' +
+    person(300, 124, 1.6, a) +
+    '<rect x="352" y="30" width="26" height="20" rx="3" fill="' + LIGHT + '"/><rect x="363" y="50" width="3" height="80" fill="' + MID + '"/>' +
+    '<path d="M352 50 L330 130 H398 L378 50 Z" fill="' + a + '" opacity=".10"/>'; },
+  field(a){ return '<rect x="0" y="118" width="420" height="32" fill="#101820"/>' +
+    '<ellipse cx="210" cy="122" rx="190" ry="26" fill="none" stroke="' + DIM + '"/>' +
+    '<path d="M150 150 L186 104 h48 l36 46" fill="none" stroke="' + DIM + '"/>' +
+    [56,364].map(x => '<g><rect x="' + (x - 2) + '" y="30" width="4" height="92" fill="' + MID + '"/><rect x="' + (x - 14) + '" y="18" width="28" height="14" rx="3" fill="' + LIGHT + '"/><path d="M' + (x - 14) + ' 32 L' + (x - 40) + ' 122 H' + (x + 40) + ' L' + (x + 14) + ' 32 Z" fill="' + a + '" opacity=".07"/></g>').join('') +
+    '<g fill="' + MID + '"><rect x="196" y="86" width="2.5" height="26"/><rect x="204" y="86" width="2.5" height="26"/><rect x="212" y="86" width="2.5" height="26"/></g>' +
+    person(258, 112, 1.35, a) + '<rect x="268" y="80" width="3" height="30" rx="1.5" fill="' + a + '" transform="rotate(28 268 95)"/>' +
+    person(168, 112, 1.1, DIM) + '<circle class="pulse" cx="300" cy="104" r="5" fill="' + a + '"/>'; },
+  gym(a){ return '<rect x="40" y="128" width="340" height="4" rx="2" fill="' + MID + '"/>' +
+    person(180, 128, 1.6, a, 0) +
+    '<rect x="96" y="70" width="168" height="5" rx="2.5" fill="' + LIGHT + '"/>' +
+    [[104,'14'],[120,'20'],[240,'20'],[256,'14']].map(d => '<rect x="' + d[0] + '" y="' + (72 - +d[1]) + '" width="12" height="' + (+d[1] * 2 + 6) + '" rx="3" fill="' + a + '" opacity=".8"/>').join('') +
+    '<rect x="300" y="96" width="26" height="40" rx="4" fill="#12161F" stroke="' + LIGHT + '"/><rect x="306" y="102" width="14" height="24" rx="2" fill="' + a + '" opacity=".5"/>' +
+    person(330, 132, 1.1, DIM) + person(70, 132, 1.05, DIM); },
+  door(a){ return '<rect x="150" y="12" width="120" height="124" rx="4" fill="#0E121A" stroke="' + MID + '"/>' +
+    '<path d="M158 20 h104 v108 h-104 z" fill="' + a + '" opacity=".14"/>' +
+    '<path d="M158 128 L120 150 H300 L262 128 Z" fill="' + a + '" opacity=".10"/>' +
+    '<circle cx="256" cy="76" r="3.5" fill="' + LIGHT + '"/>' +
+    person(196, 124, 1.25, '#12161F') + person(228, 124, 1.25, '#12161F') +
+    person(86, 132, 1.45, a) +
+    '<path d="M110 118 h26" stroke="' + a + '" stroke-dasharray="3 4" opacity=".6"/>'; },
+  frame(a){ return '<rect x="96" y="20" width="228" height="104" rx="6" fill="#12161F" stroke="' + LIGHT + '" stroke-width="3"/>' +
+    '<rect x="108" y="32" width="204" height="80" rx="3" fill="#0E121A"/>' +
+    person(148, 106, 1.15, DIM) + person(186, 104, 1.2, DIM) + person(232, 104, 1.2, DIM) + person(272, 106, 1.15, DIM) +
+    person(210, 100, 1.3, a) +
+    '<g class="flash"><path d="M44 40 l10 22 l-10 22" fill="none" stroke="' + a + '" stroke-width="2" opacity=".8"/><circle cx="34" cy="62" r="6" fill="' + a + '"/></g>' +
+    '<rect x="150" y="132" width="120" height="6" rx="3" fill="' + MID + '"/>'; },
+  pair(a){ return crowdRow(56, 7, 50, 54, '#1C2330', .85) +
+    '<ellipse cx="210" cy="112" rx="70" ry="18" fill="#161B26" stroke="' + MID + '"/>' +
+    person(160, 104, 1.45, a) + person(260, 104, 1.45, LIGHT) +
+    '<path class="pulse" d="M198 74 a9 9 0 0 1 12-5 9 9 0 0 1 12 5c0 10-12 18-12 18s-12-8-12-18z" fill="' + a + '" opacity=".5"/>'; },
+  mirror(a){ return '<rect x="186" y="6" width="3" height="138" fill="' + MID + '" opacity=".7"/>' +
+    person(130, 118, 1.7, a) +
+    '<g opacity=".35" transform="translate(420,0) scale(-1,1)">' + person(130, 118, 1.7, LIGHT) +
+    '<ellipse cx="130" cy="124" rx="48" ry="8" fill="' + a + '" opacity=".10"/>'; }
+};
+function sceneSVG(key, accent){
+  const fn = SCENE_LIB[key] || SCENE_LIB.crowd;
+  return '<svg viewBox="0 0 420 150" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet">' +
+    '<rect width="420" height="150" fill="none"/>' + fn(accent) + '</svg>';
+}
+
+const SituationEngine = {
+  kind(edge){ return edge > 0 ? 'good' : edge < 0 ? 'bad' : 'neutral'; },
+  roundOf(turn){
+    let t = turn;
+    for (const r of CONFIG.rounds){ if (t <= r.turns) return r; t -= r.turns; }
+    return CONFIG.rounds[CONFIG.rounds.length - 1];
+  },
+  draw(run, rng){
+    const c = CONFIG.situation;
+    const round = this.roundOf(run.turn).n;
+    const refs = REFLECTIONS.filter(r => !run.used.includes(r.id));
+    if (round > 1 && run.turn >= 3 && run.turn - run.lastReflect >= c.reflectGap && refs.length && rng() < c.reflectChance){
+      const r = refs[Math.floor(rng() * refs.length)];
+      run.used.push(r.id); run.lastReflect = run.turn;
+      return { kind:'reflect', id:r.id };
+    }
+    /* this round's deck, nothing repeated inside a run, and nothing you've
+       already seen in earlier runs until the whole round deck is exhausted */
+    const deck = SITUATIONS.filter(x => ROUND_OF[x.id] === round);
+    const player = playerService.get();
+    const seen = player.seen || (player.seen = {});
+    let pool = deck.filter(x => !run.used.includes(x.id) && !seen[x.id]);
+    if (!pool.length){
+      deck.forEach(x => { delete seen[x.id]; });
+      pool = deck.filter(x => !run.used.includes(x.id));
+    }
+    if (!pool.length) pool = deck.length ? deck : SITUATIONS.slice();
+    const total = pool.reduce((a, x) => a + x.w, 0);
+    let roll = rng() * total, s = pool[pool.length - 1];
+    for (const x of pool){ roll -= x.w; if (roll <= 0){ s = x; break; } }
+    run.used.push(s.id);
+    seen[s.id] = 1; playerService.save(player);
+    const u = rng(), E = c.edge;
+    const edge = s.cat === 'Trap' ? (u < .6 ? -14 : u < .9 ? -6 : E) : (u < .3 ? E : u < .7 ? 0 : -E);
+    const truth = this.kind(edge);
+    let clue = truth;
+    if (rng() >= c.clueAccuracy){
+      const v = rng();
+      clue = truth === 'neutral' ? (v < .5 ? 'good' : 'bad') : (v < .67 ? 'neutral' : truth === 'good' ? 'bad' : 'good');
+    }
+    return { kind:'bet', id:s.id, edge, clue };
+  },
+  /* did the move match the truth? neutral edges don't count */
+  read(edge, opt){ if (!edge) return null; return edge > 0 ? opt !== 'safe' : (opt === 'safe' || opt === 'pass'); }
+};
+
+/* ---------------------------------------------------------------- utils */
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const sgn = n => (n > 0 ? '+' : n < 0 ? '−' : '±') + fmt(Math.abs(n));
+const pc = (v, d) => (v * 100).toFixed(d || 0) + '%';
+const spc = v => (v > 0 ? '+' : v < 0 ? '−' : '±') + Math.abs(Math.round(v)) + '%';
+function edgeText(e){ return e > 0 ? 'It was favourable (+' + e + '%).' : e < 0 ? 'It was unfavourable (−' + Math.abs(e) + '%).' : 'It was neutral (±0%).'; }
+function hashSeed(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function generateRunSeed(){const c='ACDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+function makeRng(seed, a){
+  const st = { a: a === undefined ? hashSeed(seed) : a };
+  const f = () => { st.a |= 0; st.a = st.a + 0x6D2B79F5 | 0; let t = Math.imul(st.a ^ st.a >>> 15, 1 | st.a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  f.state = st; return f;
+}
+
+/* -------------------------------------------------------------- engines */
+const StatureEngine = {
+  band(s){ let b = CONFIG.bands[0]; for (const x of CONFIG.bands) if (s >= x[0]) b = x; return { name:b[1], color:b[2] }; }
+};
+const ExposureEngine = {
+  of(s){ const f = s / 100; return (CONFIG.vol.base + CONFIG.vol.k * f * f) / 100; },
+  level(v){ return v < .18 ? 'Low' : v < .32 ? 'Medium' : v < .5 ? 'High' : 'Extreme'; },
+  note(v){ return v < .18 ? 'Few people are watching.' : v < .32 ? 'People are starting to notice.' : v < .5 ? 'Your decisions are visible now.' : 'Everyone is watching.'; }
+};
+const VolatilityEngine = ExposureEngine;
+const RiskEngine = {
+  exposure(bet, wallet){ return wallet > 0 ? bet / wallet : 1; },
+  category(e){ let b = CONFIG.exposureBands[0]; for (const x of CONFIG.exposureBands) if (e >= x[0]) b = x; return { name:b[1], color:b[2] }; },
+  recommended(s){ return Math.max(.03, CONFIG.recExposure.at0 - CONFIG.recExposure.drop * (s / 100)); }
+};
+const RewardEngine = { rate(s, e){ const r = CONFIG.reward; return r.base + r.stature * (s / 100) + r.exposure * e; } };
+const BetEngine = {
+  max(wallet){ return Math.max(CONFIG.minBet, Math.floor(wallet * CONFIG.maxExposure)); },
+  valid(bet, wallet){ return bet >= CONFIG.minBet && bet <= this.max(wallet) && bet <= wallet; }
+};
+
+const OutcomeEngine = {
+  base(s, e){ const o = CONFIG.odds; return o.base - o.stature * Math.pow(s / 100, o.staturePow) - o.exposure * e; },
+  luckRange(vol){ return Math.min(CONFIG.luck.max, CONFIG.luck.base + vol * 100 * CONFIG.luck.perVol); },
+  /* Skill = documented, learnable inputs only. */
+  skill(run, bet, opt){
+    const k = CONFIG.skill, items = [];
+    const sit = run.situation;
+    if (sit && sit.kind === 'bet'){
+      if (sit.clue === 'bad' && opt === 'allin') items.push(['All in against a warning sign', -3]);
+      else if ((sit.clue === 'good' && opt !== 'safe') || (sit.clue === 'bad' && opt === 'safe')) items.push(['Move matches the signal', 2]);
+    }
+    const e = RiskEngine.exposure(bet, run.wallet), rec = RiskEngine.recommended(run.stature);
+    if (e <= rec) items.push(['Sized for your state', k.sized]);
+    else if (e > rec * 2) items.push(['Oversized for your state', k.oversized]);
+    const c = clamp(Math.round((run.composure - 50) / k.composureDiv), -k.composureCap, k.composureCap);
+    if (c) items.push(['Composure', c]);
+    const prev = run.bets[run.bets.length - 1];
+    if (prev){
+      if (!prev.win && bet > prev.amount * 1.25) items.push(['Raising after a loss', k.chase]);
+      if (run.streak >= 2 && bet > prev.amount * 1.5) items.push(['Escalating on a streak', k.escalate]);
+      if (Math.abs(bet / prev.amount - 1) <= .25 && !(!prev.win && bet > prev.amount * 1.25)) items.push(['Consistent sizing', k.consistent]);
+      if (prev.near && bet <= prev.amount) items.push(['Stepped back after a close call', k.stepBack]);
+    }
+    const total = clamp(items.reduce((a, i) => a + i[1], 0), k.min, k.max);
+    return { total, items };
+  },
+  preview(run, bet, opt){
+    opt = opt || 'bold';
+    const mv = CONFIG.moves[opt];
+    const e = RiskEngine.exposure(bet, run.wallet);
+    const vol = VolatilityEngine.of(run.stature);
+    const roundMul = SituationEngine.roundOf(run.turn).payoff;
+    const rate = RewardEngine.rate(run.stature, e) * mv.rate * roundMul;
+    const base = this.base(run.stature, e) + mv.odds;
+    const sk = this.skill(run, bet, opt);
+    const p = clamp(base + sk.total / 100, CONFIG.odds.min, CONFIG.odds.max);
+    const luck = this.luckRange(vol);
+    const gain = Math.round(bet * rate);
+    const rec = RiskEngine.recommended(run.stature);
+    const dq = DecisionEngine.grade({ e, rec, p, rate, skill:sk.total, items:sk.items });
+    const statureGain = (CONFIG.stature.winBase + e * CONFIG.stature.winPerExposure) * mv.stature;
+    return { bet, opt, mv, e, vol, rate, base, skill:sk, p, luck, gain, statureGain, rec, dq, cat:RiskEngine.category(e) };
+  },
+  resolve(pv, rng, forced, edge){
+    const luck = forced && forced.luck !== undefined ? forced.luck : (rng() * 2 - 1) * pv.luck;
+    const pFinal = clamp(pv.p + luck / 100 + (edge || 0) / 100, .03, .97);
+    let roll = rng();
+    if (forced && forced.result === 'win') roll = 0;
+    if (forced && forced.result === 'loss') roll = .999;
+    return { luck, pFinal, roll, win: roll < pFinal };
+  }
+};
+
+const DecisionEngine = {
+  grade({ e, rec, p, rate, skill, items }){
+    const ev = p * rate - (1 - p);
+    const chasing = items.some(i => i[0] === 'Raising after a loss');
+    if (e > .4 || skill <= -6 || ev < -.2 || (chasing && e > rec)) return 'Reckless';
+    if (e > rec * 2 || ev < 0 || skill < 0) return 'Risky';
+    if (skill >= 5 && e <= rec && ev > 0) return 'Strong';
+    return 'Sound';
+  },
+  good(dq){ return dq === 'Strong' || dq === 'Sound'; },
+  reason(dq, win, luck){
+    const g = this.good(dq);
+    if (win && g) return luck >= 0 ? 'Good decision, and luck agreed' : 'Good decision held up against bad luck';
+    if (win && !g) return 'Favorable luck';
+    if (!win && g) return 'Unfavorable luck';
+    return 'The risk you took came due';
+  }
+};
+
+const NearMissEngine = { check(run){ const d = run.crashPoint - run.stature; return d > 0 && d <= CONFIG.nearMissWindow ? Math.ceil(d) : 0; } };
+
+/* --------------------------------------------------------------- storage */
+const Store = (() => {
+  const mem = {}; let ok = true;
+  try { localStorage.setItem('__g', '1'); localStorage.removeItem('__g'); } catch(e){ ok = false; }
+  return {
+    ok,
+    get(k, f){ try { const v = ok ? localStorage.getItem(k) : mem[k]; return v ? JSON.parse(v) : f; } catch(e){ return f; } },
+    set(k, v){ const s = JSON.stringify(v); try { ok ? localStorage.setItem(k, s) : (mem[k] = s); } catch(e){ mem[k] = s; } },
+    del(k){ try { ok && localStorage.removeItem(k); } catch(e){} delete mem[k]; }
+  };
+})();
+
+/* SERVER NOTES — this prototype is client-authoritative. In production:
+   · the server issues the run seed and holds the crash point; the client never sees either until the run ends
+   · each bet is a POST; the server recomputes preview (skill, odds, luck range) from its own state,
+     draws luck from the seeded stream, and returns the result — the client never submits an outcome
+   · records, archetypes and challenges are recomputed server-side from the stored bet log
+   Swap LocalAdapter for an API/Supabase adapter with the same methods; nothing else changes. */
+const LocalAdapter = {
+  K: { player:'gambull3.player', runs:'gambull3.runs', live:'gambull4.live', settings:'gambull3.settings' },
+  getPlayer(){ return Store.get(this.K.player, null); },
+  savePlayer(p){ Store.set(this.K.player, p); },
+  listRuns(){ return Store.get(this.K.runs, []); },
+  saveRun(r){ const a = this.listRuns(); a.push(r); Store.set(this.K.runs, a.slice(-40)); },
+  getLive(){ return Store.get(this.K.live, null); },
+  saveLive(r){ Store.set(this.K.live, r); },
+  clearLive(){ Store.del(this.K.live); },
+  getSettings(){ return Store.get(this.K.settings, { sound:true, seenIntro:false }); },
+  saveSettings(s){ Store.set(this.K.settings, s); },
+  reset(){ Object.values(this.K).forEach(k => Store.del(k)); }
+};
+const Backend = LocalAdapter;
+
+const playerService = {
+  get(){
+    let p = Backend.getPlayer();
+    if (!p){
+      p = { id:'GMB-' + String(hashSeed(generateRunSeed() + Date.now()) % 100000).padStart(5, '0'), username:'Player', createdAt:Date.now(),
+        totalRuns:0, totalBets:0, totalWins:0, totalLosses:0, totalCrashes:0, totalGroundings:0, walkaways:0, selfAware:0,
+        records:{}, archetype:'The Unknown', prevArchetype:null, challenge:null, seen:{} };
+      Backend.savePlayer(p);
+    }
+    return p;
+  },
+  save(p){ Backend.savePlayer(p); }
+};
+const runService = { list(){ return Backend.listRuns(); }, save(r){ Backend.saveRun(r); } };
+const analyticsService = {
+  allBets(){ return runService.list().flatMap(r => r.bets || []); },
+  avg(a){ return a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0; }
+};
+
+/* ---------------------------------------------------------- event engine */
+const EventEngine = {
+  /* observations at the moment the bet is placed (about the decision) */
+  onPlace(run, bet){
+    const out = [], prev = run.bets[run.bets.length - 1];
+    if (!prev) return out;
+    if (!prev.win && bet > prev.amount * 1.25){
+      run.chases++;
+      out.push(['Chasing', 'You raised your bet right after a loss (' + fmt(prev.amount) + ' → ' + fmt(bet) + '). You\'re trying to get it back.']);
+    }
+    if (prev.win && bet > prev.amount * 1.1) run.winRaises++;
+    if (run.streak >= 2 && bet > prev.amount * 1.5){
+      const betGrowth = bet / prev.amount - 1, walletGrowth = run.wallet / Math.max(1, run.walletAtStreakStart) - 1;
+      run.escalations++;
+      if (betGrowth > walletGrowth) out.push(['Confidence', 'Your confidence is growing faster than your standing. Stake +' + Math.round(betGrowth * 100) + '%, pride +' + Math.round(walletGrowth * 100) + '%.']);
+    }
+    const amounts = run.bets.map(b => b.amount);
+    if (run.bets.length >= 4){
+      const top = amounts.slice().sort((x, y) => y - x);
+      const recent = amounts.slice(-2).concat([bet]);
+      if (recent.every(a => a >= top[2]) && !out.length) out.push(['Greed', 'Your last three stakes are the biggest of the run.']);
+    }
+    if (bet > CONFIG.startWallet && !out.length) out.push(['Greed', 'You\u2019re risking more pride on this one moment than you started the whole run with.']);
+    if (run.bets.length >= 8 && !out.length){
+      const early = analyticsService.avg(amounts.slice(0, 4)), late = analyticsService.avg(amounts.slice(-3).concat([bet]));
+      if (late >= early * 1.3) out.push(['Greed', 'Your average stake is up ' + Math.round((late / early - 1) * 100) + '% since the start of the run.']);
+    }
+    if (run.stature >= 70 && run.stones > 0 && run.sinceHigh >= 2 && !out.length) out.push(['Greed', 'You\u2019ve passed ' + run.sinceHigh + ' chances to step back since you got up here.']);
+    const last3 = run.bets.slice(-2).map(b => b.amount).concat([bet]);
+    if (last3.length === 3 && last3[0] < last3[1] && last3[1] < last3[2] && !out.length) out.push(['Confidence', 'Your stakes are getting larger. Three increases in a row.']);
+    const wins = run.bets.filter((b, i) => b.win && i < run.bets.length);
+    if (run.winRaises >= 3 && run.winRaises === wins.length && !out.length) out.push(['Pattern', 'You\'ve raised your stake after every win.']);
+    return out;
+  },
+  /* observations after the outcome */
+  onResult(run, b){
+    const out = [];
+    if (b.win && run.streak === 3) out.push(['Momentum', 'Three in a row. People are starting to expect it.']);
+    else if (b.win && run.streak === 4) out.push(['False control', 'Your last four decisions worked. That isn\'t the same thing as being right.']);
+    if (b.win && !DecisionEngine.good(b.dq)) out.push(['Doubt', 'That won, but the decision read ' + b.dq.toLowerCase() + '. How much of that was skill?']);
+    if (!b.win && DecisionEngine.good(b.dq) && b.luck < -2) out.push(['Luck', 'A sound call lost to a ' + spc(b.luck) + ' swing. The decision was still fine.']);
+    if (!b.win && run.streak === -2) out.push(['Pressure', 'Two bad moments in a row. The next stake is where chasing usually starts.']);
+    const vb = VolatilityEngine.of(b.stature), va = VolatilityEngine.of(run.stature);
+    if (vb < .3 && va >= .3) out.push(['Exposure', 'Exposure just passed 30%. More people are watching, and the luck range is wider.']);
+    return out;
+  },
+  /* mirror events: your own history, played back */
+  mirror(run){
+    const out = [], past = runService.list();
+    if (!past.length) return out;
+    if (!run.flags.m60 && run.stature >= 60){
+      run.flags.m60 = true;
+      const bets = past.flatMap(r => r.bets || []);
+      const hi = bets.filter(b => b.s >= 60).map(b => b.e), lo = bets.filter(b => b.s < 60).map(b => b.e);
+      if (hi.length >= 3 && lo.length >= 5){
+        const r = analyticsService.avg(hi) / Math.max(.001, analyticsService.avg(lo));
+        if (r >= 1.15) out.push(['Mirror', 'In past runs your stakes grew ' + Math.round((r - 1) * 100) + '% once you passed 60. You usually get bolder around here.']);
+      }
+    }
+    if (!run.flags.mStreak && run.streak === 2){
+      run.flags.mStreak = true;
+      const bets = past.flatMap(r => r.bets || []);
+      const st = bets.filter(b => b.k >= 2).map(b => b.e), ot = bets.filter(b => b.k < 2).map(b => b.e);
+      if (st.length >= 3 && ot.length >= 5 && analyticsService.avg(st) > analyticsService.avg(ot) * 1.25)
+        out.push(['Mirror', 'Your biggest stakes have usually come right after a run of wins.']);
+    }
+    if (!run.flags.mStone && run.stones === 1){
+      run.flags.mStone = true;
+      const last = past[past.length - 1];
+      if (last && last.groundings && last.groundings.length) out.push(['Mirror', 'One Humble Stone left. Last run you used your final one at ' + Math.round(last.groundings[last.groundings.length - 1].from) + '.']);
+    }
+    return out;
+  }
+};
+
+/* ------------------------------------------------------ archetype engine */
+const ARCH = {
+  'The Unknown':    'Not enough data yet. Play two runs and a pattern will show.',
+  'The Chaser':     'You stake more right after a moment goes badly.',
+  'The Edgewalker': 'You spend your runs close to the breaking point.',
+  'The Grounded':   'You reset your ego on purpose, before it resets you.',
+  'The Escapist':   'You leave early, often before the climb really starts.',
+  'The Climber':    'You push your standing high and stay up there.',
+  'The Calculator': 'You keep your stakes measured against the standing you already have.',
+  'The Balancer':   'Your stakes stay steady however high you get.',
+  'The Reader':     'You read the room well and pick your move to match it.'
+};
+const ArchetypeEngine = {
+  metrics(r){
+    const es = r.bets.map(b => b.e), m = analyticsService.avg(es);
+    const sd = Math.sqrt(analyticsService.avg(es.map(x => (x - m) * (x - m))));
+    const losses = r.bets.filter(b => !b.w).length;
+    return { avgE:m, cv:m ? sd / m : 0, chaseRate:losses ? r.chases / losses : 0, peakRatio:r.peakStature / r.crashPoint,
+      crashed:r.outcome === 'EGO CRASH' ? 1 : 0, g:r.groundings.length, early:(r.outcome.startsWith('WALKED') && !r.completed && r.bets.length < 6) ? 1 : 0, peak:r.peakStature,
+      readAcc:r.readAcc == null ? .5 : r.readAcc };
+  },
+  classify(runs){
+    if (runs.length < 2) return 'The Unknown';
+    const ms = runs.map(r => this.metrics(r)), A = k => analyticsService.avg(ms.map(m => m[k]));
+    if (A('chaseRate') >= .5) return 'The Chaser';
+    if (A('crashed') >= .5 || A('peakRatio') >= .92) return 'The Edgewalker';
+    if (A('readAcc') >= .72) return 'The Reader';
+    if (A('g') >= 1.5) return 'The Grounded';
+    if (A('early') >= .5) return 'The Escapist';
+    if (A('peak') >= 65) return 'The Climber';
+    if (A('avgE') <= .07 && A('cv') < .5) return 'The Calculator';
+    if (A('cv') < .35) return 'The Balancer';
+    return A('avgE') < .12 ? 'The Calculator' : 'The Climber';
+  },
+  update(p, runs){
+    const cur = this.classify(runs.slice(-3));
+    if (cur !== p.archetype){ p.prevArchetype = p.archetype === 'The Unknown' ? p.prevArchetype : p.archetype; p.archetype = cur; }
+    return cur;
+  }
+};
+
+/* --------------------------------------------------------- record engine */
+const RECORDS = [
+  ['highestStature', 'Highest standing', v => Math.round(v), 'max'],
+  ['highestPride', 'Highest pride', v => fmt(v), 'max'],
+  ['highestProfit', 'Highest profit', v => sgn(v), 'max'],
+  ['highestBet', 'Biggest single stake', v => fmt(v), 'max'],
+  ['closestCrash', 'Closest to the fall', v => v + ' pt' + (v === 1 ? '' : 's'), 'min'],
+  ['longestRun', 'Longest climb', v => v + ' moments', 'max'],
+  ['mostWins', 'Most moments won', v => v + ' wins', 'max'],
+  ['bestWinRate', 'Best win rate', v => pc(v), 'max'],
+  ['mostGroundings', 'Most ego resets', v => v + ' / 3', 'max'],
+  ['mostControlled', 'Most controlled run', v => pc(v) + ' sound', 'max'],
+  ['biggestRecovery', 'Biggest recovery', v => '+' + fmt(v), 'max'],
+  ['controlledStreak', 'Longest controlled streak', v => v + ' moments', 'max'],
+  ['sharpestRead', 'Sharpest read', v => pc(v) + ' correct', 'max']
+];
+const RecordEngine = {
+  fromRun(r){
+    const bets = r.bets, n = bets.length, wins = bets.filter(b => b.w).length;
+    const good = bets.filter(b => b.q === 'Strong' || b.q === 'Sound').length;
+    let streak = 0, best = 0; bets.forEach(b => { streak = (b.q === 'Strong' || b.q === 'Sound') ? streak + 1 : 0; best = Math.max(best, streak); });
+    const v = {
+      highestStature:r.peakStature, highestPride:r.peakWallet, highestProfit:r.endingWallet - r.startingWallet,
+      highestBet:r.highestBet, longestRun:n, mostWins:wins, mostGroundings:r.groundings.length,
+      controlledStreak:best, biggestRecovery:Math.max(0, r.endingWallet - r.lowWallet)
+    };
+    if (r.crashPoint - r.peakStature > 0 && r.outcome !== 'EGO CRASH') v.closestCrash = Math.ceil(r.crashPoint - r.peakStature);
+    if (n >= 5){ v.bestWinRate = wins / n; v.mostControlled = good / n; }
+    if ((r.readsRight || 0) + (r.readsWrong || 0) >= 5) v.sharpestRead = r.readAcc;
+    return v;
+  },
+  apply(p, r){
+    const v = this.fromRun(r), fresh = [];
+    RECORDS.forEach(([k, , , dir]) => {
+      if (v[k] === undefined || v[k] === 0 && dir === 'max') return;
+      const old = p.records[k];
+      const better = old === undefined || (dir === 'max' ? v[k] > old.v : v[k] < old.v);
+      if (better){ if (old !== undefined) fresh.push(k); p.records[k] = { v:v[k], run:r.no }; }
+    });
+    return fresh;
+  }
+};
+
+/* ------------------------------------------------------ challenge engine */
+const ChallengeEngine = {
+  generate(r){
+    const m = ArchetypeEngine.metrics(r);
+    if (r.outcome === 'EGO CRASH' && r.peakStature >= 65) return { type:'reach-no-raise', v:65, text:'Reach 65 without raising your stake once you pass 50.', why:'You fell after reaching ' + Math.round(r.peakStature) + '.' };
+    if ((r.readsWrong || 0) >= 3 && r.readsWrong >= r.readsRight) return { type:'read', v:.7, text:'Read at least 70% of the rooms correctly.', why:'Your moves went against the true edge ' + r.readsWrong + ' times last run.' };
+    if (r.chases >= 2) return { type:'no-chase', text:'Finish a run without raising your stake after a bad moment.', why:'You raised it after ' + r.chases + ' of them last run.' };
+    if (r.escalations >= 2 || r.winRaises >= 3) return { type:'stable-streak', text:'Keep your stake steady after a run of wins.', why:'You raised it after every streak last run.' };
+    if (r.highestBet > 150) return { type:'cap', v:100, text:'Climb without ever staking more than 100.', why:'Your biggest stake was ' + fmt(r.highestBet) + '.' };
+    if (r.nearMisses && !r.groundedAfterNear) return { type:'ground-near', text:'Reset your ego after your next close call.', why:'You had one and kept climbing anyway.' };
+    if (m.early) return { type:'longer', v:10, text:'Play at least 10 moments before you leave.', why:'You left after ' + r.bets.length + '.' };
+    if (r.outcome.startsWith('WALKED') && r.endingWallet - r.startingWallet > 0) return { type:'beat', v:r.endingWallet - r.startingWallet, text:'Leave on top with more than ' + sgn(r.endingWallet - r.startingWallet) + ' pride and a stone unused.', why:'Your last climb to beat.' };
+    return { type:'walk-profit', v:200, text:'Leave on top with +200 pride or more.', why:'A clean exit is the first thing to master.' };
+  },
+  evaluate(c, r){
+    if (!c) return null;
+    const profit = r.endingWallet - r.startingWallet, n = r.bets.length;
+    switch (c.type){
+      case 'reach-no-raise': return r.peakStature >= c.v && r.outcome !== 'EGO CRASH' && !r.raisedAbove50;
+      case 'read': return (r.readsRight + r.readsWrong) >= 5 && r.readAcc >= c.v;
+      case 'no-chase': return n >= 5 && r.chases === 0;
+      case 'stable-streak': return n >= 5 && r.escalations === 0 && r.winRaises === 0;
+      case 'cap': return n >= 5 && r.highestBet <= c.v;
+      case 'ground-near': return r.groundedAfterNear;
+      case 'longer': return n >= c.v;
+      case 'beat': return r.outcome.startsWith('WALKED') && profit > c.v && r.stonesLeft >= 1;
+      case 'walk-profit': return r.outcome.startsWith('WALKED') && profit >= c.v;
+    }
+    return null;
+  }
+};
+
+/* ================================================================= GAME */
+const Game = {
+  run: null, rng: null, forced: null,
+
+  newRun(seed){
+    const p = playerService.get();
+    seed = (seed || generateRunSeed()).toUpperCase();
+    const rng = makeRng(seed);
+    const crashPoint = Math.round(CONFIG.crash.min + rng() * (CONFIG.crash.max - CONFIG.crash.min));
+    this.rng = rng;
+    this.run = {
+      id:'R-' + Date.now().toString(36).toUpperCase(), no:p.totalRuns + 1, seed, startedAt:Date.now(),
+      wallet:CONFIG.startWallet, startingWallet:CONFIG.startWallet, stature:CONFIG.startStature, composure:CONFIG.startComposure,
+      stones:CONFIG.stones, crashPoint, bets:[], events:[], groundings:[],
+      peakStature:CONFIG.startStature, peakVol:VolatilityEngine.of(CONFIG.startStature), peakWallet:CONFIG.startWallet, lowWallet:CONFIG.startWallet,
+      highestBet:0, largestWin:0, largestLoss:0, streak:0, walletAtStreakStart:CONFIG.startWallet,
+      nearMisses:0, chases:0, winRaises:0, escalations:0, groundedAfterNear:false, raisedAbove50:false,
+      flags:{}, sigShown:false, status:'live', outcome:null, challenge:p.challenge,
+      turn:1, used:[], lastReflect:0, situation:null, log:[], path:[{ k:'s', s:CONFIG.startStature }], sinceHigh:0,
+      readsRight:0, readsWrong:0, passes:0, goodPasses:0, completed:false
+    };
+    this.run.situation = SituationEngine.draw(this.run, rng);
+    this.persist();
+    return this.run;
+  },
+
+  advanceTurn(){
+    const r = this.run;
+    r.turn++;
+    if (r.turn > CONFIG.situation.turns){ r.status = 'complete'; r.completed = true; r.situation = null; return true; }
+    r.situation = SituationEngine.draw(r, this.rng);
+    return false;
+  },
+  countRead(read){ if (read === true) this.run.readsRight++; else if (read === false) this.run.readsWrong++; },
+
+  pass(){
+    const r = this.run, s = r.situation;
+    if (r.status !== 'live' || !s || s.kind !== 'bet') return null;
+    const data = SIT_BY_ID[s.id], read = SituationEngine.read(s.edge, 'pass');
+    r.passes++; if (s.edge < 0) r.goodPasses++;
+    this.countRead(read);
+    r.composure = clamp(r.composure + CONFIG.situation.passComposure, 0, 100);
+    r.log.push({ t:'pass', n:r.bets.length, title:data.title, edge:s.edge, read });
+    r.path.push({ k:'p', s:r.stature });
+    const txt = 'You passed on "' + data.title + '". ' + edgeText(s.edge) + (read === true ? ' Good pass.' : read === false ? ' That one was worth playing.' : '');
+    r.events.push({ n:r.bets.length, type:'Passed', text:txt });
+    const complete = this.advanceTurn();
+    this.persist();
+    return { edge:s.edge, read, txt, complete };
+  },
+
+  reflect(i){
+    const r = this.run, s = r.situation;
+    if (r.status !== 'live' || !s || s.kind !== 'reflect') return null;
+    const data = REF_BY_ID[s.id], ch = data.choices[i];
+    const from = r.stature;
+    r.stature = clamp(r.stature + ch[1], CONFIG.stature.floor, 100);
+    r.composure = clamp(r.composure + ch[2], 0, 100);
+    r.peakStature = Math.max(r.peakStature, r.stature);
+    r.log.push({ t:'reflect', n:r.bets.length, title:data.title, choice:ch[0], from, to:r.stature });
+    r.path.push({ k:'r', s:r.stature });
+    const txt = data.title + ' — you chose to ' + ch[0].toLowerCase() + '. Stature ' + Math.round(from) + ' → ' + Math.round(r.stature) + ', composure ' + (ch[2] > 0 ? '+' : '−') + Math.abs(ch[2]) + '.';
+    r.events.push({ n:r.bets.length, type:'Reflection', text:txt });
+    let crash = false, loss = 0;
+    if (r.stature >= r.crashPoint){
+      crash = true; loss = -Math.floor(r.wallet * CONFIG.crashPenalty); r.wallet += loss; r.status = 'crashed';
+    }
+    const complete = crash ? false : this.advanceTurn();
+    this.persist();
+    return { txt, crash, loss, from, to:r.stature, complete };
+  },
+  restore(saved){ this.run = saved; this.rng = makeRng(saved.seed, saved.rngA); },
+  persist(){ if (this.run){ this.run.rngA = this.rng.state.a; Backend.saveLive(this.run); } },
+
+  preview(bet, opt){ return OutcomeEngine.preview(this.run, bet, opt); },
+
+  place(bet, opt){
+    const run = this.run, sit = run.situation;
+    if (run.status !== 'live' || !sit || sit.kind !== 'bet' || !BetEngine.valid(bet, run.wallet)) return null;
+    opt = opt || 'bold';
+    const data = SIT_BY_ID[sit.id];
+    const pv = this.preview(bet, opt);
+    const before = { wallet:run.wallet, stature:run.stature, composure:run.composure, vol:pv.vol };
+    const prev = run.bets[run.bets.length - 1];
+    const placeEvents = EventEngine.onPlace(run, bet);
+    if (prev && run.stature >= 50 && bet > prev.amount) run.raisedAbove50 = true;
+    const chase = placeEvents.some(e => e[0] === 'Chasing');
+
+    const res = OutcomeEngine.resolve(pv, this.rng, this.forced, sit.edge); this.forced = null;
+    const read = SituationEngine.read(sit.edge, opt);
+    this.countRead(read);
+    const b = {
+      sit:sit.id, title:data.title, cat:data.cat, opt, move:data.opts[MOVE_KEYS.indexOf(opt)], edge:sit.edge, clue:sit.clue, read,
+      n:run.bets.length + 1, amount:bet, e:pv.e, rate:pv.rate, gain:pv.gain, stature:run.stature, vol:pv.vol, composure:run.composure,
+      base:pv.base, skill:pv.skill.total, skillItems:pv.skill.items, luckRange:pv.luck, luck:res.luck, p:pv.p, pFinal:res.pFinal, roll:res.roll,
+      win:res.win, dq:pv.dq, reason:DecisionEngine.reason(pv.dq, res.win, res.luck), streakBefore:run.streak, chase, near:0, crash:false, t:Date.now()
+    };
+
+    let crash = false;
+    if (b.win){
+      run.stature = clamp(run.stature + (CONFIG.stature.winBase + pv.e * CONFIG.stature.winPerExposure) * pv.mv.stature, 0, 100);
+      run.composure -= CONFIG.composure.winBase + pv.e * CONFIG.composure.winPerExposure;
+      if (run.stature >= run.crashPoint){
+        crash = true;
+        b.profit = -(bet + Math.floor((run.wallet - bet) * CONFIG.crashPenalty));
+        run.wallet += b.profit;
+      } else {
+        b.profit = pv.gain; run.wallet += pv.gain;
+      }
+      if (run.streak <= 0) run.walletAtStreakStart = before.wallet;
+      run.streak = run.streak > 0 ? run.streak + 1 : 1;
+    } else {
+      b.profit = -bet; run.wallet -= bet;
+      run.stature = Math.max(CONFIG.stature.floor, run.stature - CONFIG.stature.loss);
+      run.composure -= CONFIG.composure.loss + (chase ? CONFIG.composure.chase : 0);
+      run.streak = run.streak < 0 ? run.streak - 1 : -1;
+    }
+    if (b.dq === 'Strong') run.composure += CONFIG.composure.strong;
+    if (!crash){
+      b.near = b.win ? NearMissEngine.check(run) : 0;
+      if (b.near){ run.nearMisses++; run.composure -= CONFIG.composure.nearMiss; }
+    }
+    run.composure = clamp(run.composure, 0, 100);
+    b.crash = crash;
+    b.statureAfter = run.stature; b.walletAfter = run.wallet; b.composureAfter = run.composure;
+    b.story = crash ? data.win + ' Then it went to your head.' : b.win ? data.win : data.loss;
+
+    if (run.stature >= 70) run.sinceHigh++;
+    run.bets.push(b);
+    run.log.push({ t:'bet', n:b.n });
+    run.path.push({ k:'b', s:run.stature, w:b.win });
+    run.peakStature = Math.max(run.peakStature, run.stature);
+    run.peakVol = Math.max(run.peakVol, VolatilityEngine.of(run.stature));
+    run.peakWallet = Math.max(run.peakWallet, run.wallet);
+    run.lowWallet = Math.min(run.lowWallet, run.wallet);
+    run.highestBet = Math.max(run.highestBet, bet);
+    if (b.profit > 0) run.largestWin = Math.max(run.largestWin, b.profit); else run.largestLoss = Math.max(run.largestLoss, -b.profit);
+
+    let events = placeEvents.slice();
+    let signature = false, bust = false, complete = false;
+    if (crash){ run.status = 'crashed'; }
+    else {
+      events = events.concat(EventEngine.onResult(run, b)).concat(EventEngine.mirror(run));
+      events.push(['Read', edgeText(sit.edge) + (read === true ? ' You read it right.' : read === false ? ' Your move went against it.' : '')]);
+      if (!run.sigShown && run.stature >= CONFIG.signatureAt){ run.sigShown = true; signature = true; }
+      if (run.wallet < CONFIG.minBet){ run.status = 'bust'; bust = true; }
+      else complete = this.advanceTurn();
+    }
+    events.forEach(e => run.events.push({ n:b.n, type:e[0], text:e[1] }));
+    this.persist();
+    return { b, before, pv, events, crash, signature, bust, complete };
+  },
+
+  groundPreview(){
+    const r = this.run, to = Math.max(CONFIG.stature.floor, r.stature * CONFIG.ground.keep);
+    return { from:r.stature, to, volFrom:VolatilityEngine.of(r.stature), volTo:VolatilityEngine.of(to),
+      compFrom:r.composure, compTo:Math.min(100, r.composure + CONFIG.composure.ground), stones:r.stones,
+      rateFrom:RewardEngine.rate(r.stature, .05), rateTo:RewardEngine.rate(to, .05) };
+  },
+  ground(){
+    const r = this.run;
+    if (r.status !== 'live' || r.stones <= 0) return null;
+    const g = this.groundPreview();
+    r.stones--; r.stature = g.to; r.composure = g.compTo; r.streak = 0; r.sinceHigh = 0;
+    const last = r.bets[r.bets.length - 1];
+    if (last && last.near) r.groundedAfterNear = true;
+    r.groundings.push({ afterBet:r.bets.length, from:g.from, to:g.to });
+    r.log.push({ t:'ground', n:r.bets.length, from:g.from, to:g.to });
+    r.path.push({ k:'g', s:r.stature });
+    const ev = [['Grounded', 'Stature ' + Math.round(g.from) + ' → ' + Math.round(g.to) + '. Momentum reset. Composure ' + Math.round(g.compFrom) + ' → ' + Math.round(g.compTo) + '.']]
+      .concat(EventEngine.mirror(r));
+    ev.forEach(e => r.events.push({ n:r.bets.length, type:e[0], text:e[1] }));
+    this.persist();
+    return { g, events:ev };
+  },
+
+  end(kind){
+    const r = this.run, p = playerService.get();
+    const profit = r.wallet - r.startingWallet;
+    const goodShare = r.bets.length ? r.bets.filter(b => DecisionEngine.good(b.dq)).length / r.bets.length : 0;
+    let outcome = kind === 'crash' ? 'EGO CRASH' : kind === 'bust' ? 'OUT OF PRIDE' : profit >= 0 ? 'WALKED AWAY' : 'WALKED AWAY DOWN';
+    const reads = r.readsRight + r.readsWrong;
+    if (outcome === 'WALKED AWAY' && profit >= 150 && r.groundings.length >= 1 && r.chases === 0 && goodShare >= .7 && p.totalRuns >= 2) outcome = 'SELF-AWARE';
+
+    const rec = {
+      id:r.id, no:r.no, playerId:p.id, seed:r.seed, startedAt:r.startedAt, endedAt:Date.now(),
+      startingWallet:r.startingWallet, endingWallet:r.wallet, peakStature:r.peakStature, peakVol:r.peakVol,
+      peakWallet:r.peakWallet, lowWallet:r.lowWallet, crashPoint:r.crashPoint, outcome,
+      totalBets:r.bets.length, winningBets:r.bets.filter(b => b.win).length, losingBets:r.bets.filter(b => !b.win).length,
+      highestBet:r.highestBet, largestWin:r.largestWin, largestLoss:r.largestLoss,
+      groundings:r.groundings, nearMisses:r.nearMisses, chases:r.chases, winRaises:r.winRaises, escalations:r.escalations,
+      groundedAfterNear:r.groundedAfterNear, raisedAbove50:r.raisedAbove50, stonesLeft:r.stones,
+      completed:kind === 'complete', turns:Math.min(r.turn, CONFIG.situation.turns), readsRight:r.readsRight, readsWrong:r.readsWrong,
+      readAcc:reads ? r.readsRight / reads : null, passes:r.passes, goodPasses:r.goodPasses, path:r.path.map(p => ({ k:p.k, s:+p.s.toFixed(1), w:p.w })),
+      moves:{ safe:r.bets.filter(b => b.opt === 'safe').length, bold:r.bets.filter(b => b.opt === 'bold').length, allin:r.bets.filter(b => b.opt === 'allin').length },
+      bets:r.bets.map(b => ({ n:b.n, a:b.amount, e:+b.e.toFixed(4), s:+b.stature.toFixed(1), sa:+b.statureAfter.toFixed(1), w:b.win, k:b.streakBefore, q:b.dq, l:+b.luck.toFixed(1), pr:b.profit, wa:b.walletAfter, near:b.near, c:b.chase }))
+    };
+    const chResult = ChallengeEngine.evaluate(r.challenge, rec);
+    rec.challenge = r.challenge; rec.challengeMet = chResult;
+
+    p.totalRuns++; p.totalBets += rec.totalBets; p.totalWins += rec.winningBets; p.totalLosses += rec.losingBets;
+    p.totalGroundings += r.groundings.length;
+    if (outcome === 'EGO CRASH') p.totalCrashes++;
+    if (outcome.startsWith('WALKED') || outcome === 'SELF-AWARE') p.walkaways++;
+    if (outcome === 'SELF-AWARE') p.selfAware++;
+    const freshRecords = RecordEngine.apply(p, rec);
+    const prevArch = p.archetype;
+    ArchetypeEngine.update(p, runService.list().concat([rec]));
+    rec.archetypeAtRun = p.archetype;
+    runService.save(rec);
+    p.challenge = ChallengeEngine.generate(rec);
+    playerService.save(p);
+    Backend.clearLive();
+    r.status = 'ended'; r.outcome = outcome;
+    return { rec, freshRecords, chResult, archetype:p.archetype, prevArch, challenge:p.challenge };
+  }
+};
+
+/* ================================================================ AUDIO */
+const Sound = {
+  on:true, ctx:null, out:null,
+  init(){ if (this.ctx) return; const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    try { this.ctx = new AC(); this.out = this.ctx.createGain(); this.out.gain.value = .35; this.out.connect(this.ctx.destination); } catch(e){ this.ctx = null; } },
+  t(f, d, type, v, w){ if (!this.on || !this.ctx) return; const t = this.ctx.currentTime + (w || 0), o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v || .12, t + .01);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g).connect(this.out); o.start(t); o.stop(t + d + .05); },
+  place(){ this.t(520, .08, 'triangle', .1); this.t(320, .16, 'sine', .07, .05); },
+  deal(){ this.noise(.35, 420, .05); this.t(180, .12, 'sine', .05, .02); },
+  select(){ this.t(880, .05, 'square', .04); this.t(1320, .04, 'square', .025, .03); },
+  suspense(dur){
+    if (!this.on || !this.ctx) return;
+    const t = this.ctx.currentTime, o = this.ctx.createOscillator(), g = this.ctx.createGain(), f = this.ctx.createBiquadFilter();
+    o.type = 'sawtooth'; f.type = 'lowpass'; f.frequency.setValueAtTime(400, t); f.frequency.linearRampToValueAtTime(1800, t + dur);
+    o.frequency.setValueAtTime(110, t); o.frequency.linearRampToValueAtTime(190, t + dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.07, t + dur * .7); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(f).connect(g).connect(this.out); o.start(t); o.stop(t + dur + .05);
+  },
+  noise(vol, cut, dur){
+    if (!this.on || !this.ctx) return;
+    const t = this.ctx.currentTime, len = Math.floor(this.ctx.sampleRate * (dur || .3));
+    const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
+    const src = this.ctx.createBufferSource(); src.buffer = buf;
+    const f = this.ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = cut || 900;
+    const g = this.ctx.createGain(); g.gain.value = vol || .2;
+    src.connect(f).connect(g).connect(this.out); src.start(t);
+  },
+  round(n){
+    if (!this.on || !this.ctx) return;
+    const base = [196, 262, 330][clamp(n - 1, 0, 2)];
+    [0, 1, 2].forEach(i => this.t(base * Math.pow(1.26, i), .5, 'triangle', .1, i * .12));
+    this.t(base / 2, 1.1, 'sine', .09, 0);
+  },
+  tick(){ this.t(1100, .03, 'square', .025); },
+  win(big){ [523, 659, 784].forEach((f, i) => this.t(f, .45, 'sine', .11, i * .07)); if (big) this.t(1046, .6, 'triangle', .08, .24); },
+  loss(){ this.t(196, .4, 'sine', .14); this.t(147, .55, 'sine', .11, .09); this.noise(.1, 300, .4); },
+  crash(){ if (!this.on || !this.ctx) return; const t = this.ctx.currentTime, o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(32, t + .9); g.gain.setValueAtTime(.4, t); g.gain.exponentialRampToValueAtTime(.0001, t + 1.1);
+    o.connect(g).connect(this.out); o.start(t); o.stop(t + 1.2); },
+  ground(){ this.t(392, .5, 'sine', .08); this.t(294, .7, 'sine', .08, .15); }
+};
+
+/* ================================================================= VIEW */
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const V = { bet:50, opt:'bold', shownSit:null, firstPaint:true, lastRound:0, shown:{ wallet:CONFIG.startWallet, stature:CONFIG.startStature }, busy:false, obsTimer:null, resolveTimer:null, skipResolve:null };
+
+/* gauge geometry: semicircle, left (0) → right (100) over the top */
+const GC = { cx:130, cy:132, r:108 };
+function gp(v, r){ const a = Math.PI * (1 - v / 100); return [GC.cx + (r || GC.r) * Math.cos(a), GC.cy - (r || GC.r) * Math.sin(a)]; }
+function arc(a, b, r){ const p = gp(a, r), q = gp(b, r); return 'M' + p[0].toFixed(2) + ' ' + p[1].toFixed(2) + ' A' + (r || GC.r) + ' ' + (r || GC.r) + ' 0 0 1 ' + q[0].toFixed(2) + ' ' + q[1].toFixed(2); }
+function buildGauge(){
+  const edges = CONFIG.bands.map(b => b[0]).concat([100]);
+  let h = '';
+  CONFIG.bands.forEach((b, i) => { h += '<path d="' + arc(edges[i] + .6, edges[i + 1] - .6) + '" stroke="' + b[2] + '" stroke-opacity=".22" stroke-width="14" fill="none"/>'; });
+  h += '<path id="g-val" d="' + arc(0, .1) + '" stroke="#8E9AAF" stroke-width="14" fill="none" stroke-linecap="butt"/>';
+  [0, 25, 50, 70, 85, 100].forEach(v => {
+    const a = gp(v, GC.r + 11), b = gp(v, GC.r + 17), t = gp(v, GC.r + 28);
+    h += '<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '" stroke="#3A404C" stroke-width="1.2"/>';
+    h += '<text x="' + t[0].toFixed(1) + '" y="' + (t[1] + 3.5).toFixed(1) + '" fill="#626876" font-size="9.5" font-family="IBM Plex Mono, monospace" text-anchor="middle">' + v + '</text>';
+  });
+  h += '<line id="g-peak" stroke="#ECE8E1" stroke-opacity=".45" stroke-width="1.5"/>';
+  h += '<circle id="g-dot" r="6" fill="#ECE8E1" stroke="#0B0C0F" stroke-width="2.5"/>';
+  $('gauge').innerHTML = h;
+}
+function drawGauge(v){
+  const band = StatureEngine.band(v);
+  $('g-val').setAttribute('d', arc(0, Math.max(.1, v)));
+  $('g-val').setAttribute('stroke', band.color);
+  const d = gp(v); $('g-dot').setAttribute('cx', d[0].toFixed(2)); $('g-dot').setAttribute('cy', d[1].toFixed(2));
+  const pk = Game.run ? Game.run.peakStature : v, a = gp(pk, GC.r - 10), b = gp(pk, GC.r + 10);
+  const pl = $('g-peak'); pl.setAttribute('x1', a[0]); pl.setAttribute('y1', a[1]); pl.setAttribute('x2', b[0]); pl.setAttribute('y2', b[1]);
+  $('g-num').textContent = Math.round(v);
+  $('g-band').textContent = band.name;
+  document.documentElement.style.setProperty('--band', band.color);
+}
+
+/* tween helper */
+function tween(from, to, ms, fn, done){
+  if (reduced || ms <= 0){ fn(to); done && done(); return; }
+  const t0 = performance.now();
+  (function step(now){ const k = clamp((now - t0) / ms, 0, 1), e = 1 - Math.pow(1 - k, 3); fn(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); else done && done(); })(t0);
+}
+
+/* ----------------------------------------------------------- rendering */
+function renderAll(){ renderTop(); renderSituation(); renderState(); renderSlip(); renderLedger(); renderRisk(); renderFeed(); }
+
+function renderSituation(){
+  const r = Game.run, s = r.situation, T = CONFIG.situation.turns;
+  const turnNo = Math.min(r.turn, T);
+  const rd = SituationEngine.roundOf(turnNo);
+  let before = 0; for (const x of CONFIG.rounds){ if (x.n < rd.n) before += x.turns; }
+  $('sit-no').textContent = 'Round ' + rd.n + ' · ' + rd.name + ' · ' + (turnNo - before) + ' of ' + rd.turns;
+  $('turns').innerHTML = Array.from({ length:T }, (_, i) => '<i class="' + (i + 1 < turnNo ? 'd' : i + 1 === turnNo ? 'c' : '') + '"></i>').join('') +
+    '<span>' + (T - turnNo) + ' left after this</span>';
+  const live = r.status === 'live' && !V.busy;
+  if (!s){ $('moves').innerHTML = ''; $('b-pass').disabled = true; return; }
+  if (V.shownSit !== (s ? s.id + ':' + r.turn : null)){
+    V.shownSit = s ? s.id + ':' + r.turn : null;
+    const card = $('c-sit');
+    card.classList.remove('sit-in'); void card.offsetWidth; card.classList.add('sit-in');
+    if (!V.firstPaint) Sound.deal();
+    V.firstPaint = false;
+  }
+  if (s.kind === 'reflect'){
+    const d = REF_BY_ID[s.id];
+    $('sit-cat').textContent = 'Reflection'; $('sit-cat').className = 'cat Reflection';
+    $('sit-title').textContent = d.title; $('sit-scene').textContent = d.scene;
+    $('sit-signal').hidden = true; $('b-pass').hidden = true;
+    $('sit-art').innerHTML = sceneSVG(SCENE_OF[s.id] || 'mirror', CAT_ACCENT.Reflection);
+    $('moves').className = 'moves two';
+    $('moves').setAttribute('role', 'group');
+    $('moves').innerHTML = d.choices.map((c, i) => {
+      const to = clamp(r.stature + c[1], CONFIG.stature.floor, 100);
+      return '<button class="move" type="button" data-ref="' + i + '"' + (live ? '' : ' disabled') + '><span class="mk ref">No bet · respond</span><b>' + c[0] + '</b>' +
+        '<span class="ms">Stature ' + Math.round(r.stature) + ' → ' + Math.round(to) + ' · composure ' + (c[2] > 0 ? '+' : '−') + Math.abs(c[2]) + '</span></button>';
+    }).join('');
+    return;
+  }
+  const d = SIT_BY_ID[s.id];
+  $('sit-cat').textContent = CAT_LABEL[d.cat] || d.cat; $('sit-cat').className = 'cat ' + d.cat;
+  $('sit-title').textContent = d.title; $('sit-scene').textContent = d.scene;
+  $('sit-signal').hidden = false; $('sit-clue').textContent = d.clues[s.clue];
+  $('sit-art').innerHTML = sceneSVG(SCENE_OF[d.id] || 'crowd', CAT_ACCENT[d.cat] || '#E2C677');
+  $('b-pass').hidden = false; $('b-pass').disabled = !live;
+  $('moves').className = 'moves';
+  $('moves').setAttribute('role', 'radiogroup');
+  const bet = clampBet(V.bet);
+  $('moves').innerHTML = MOVE_KEYS.map((k, i) => {
+    const pv = Game.preview(bet, k);
+    return '<button class="move" type="button" role="radio" data-opt="' + k + '" aria-checked="' + (V.opt === k) + '"' + (live ? '' : ' disabled') + '>' +
+      '<span class="mk ' + k + '">' + CONFIG.moves[k].name + '</span><b>' + d.opts[i] + '</b>' +
+      '<span class="ms">' + pc(pv.p) + ' chance · win +' + fmt(pv.gain) + '</span></button>';
+  }).join('');
+}
+
+function renderTop(){
+  const r = Game.run, pv = Game.preview(clampBet(V.bet), V.opt);
+  $('t-run').textContent = '#' + r.no; $('t-bet').textContent = Math.min(r.turn, CONFIG.situation.turns) + ' / ' + CONFIG.situation.turns;
+  $('w-bal').textContent = fmt(V.shown.wallet);
+  const d = r.wallet - r.startingWallet;
+  $('w-delta').textContent = sgn(d) + ' this climb'; $('w-delta').className = 'delta ' + (d > 0 ? 'up' : d < 0 ? 'down' : '');
+  $('w-risk').textContent = fmt(pv.bet);
+  $('w-pot').textContent = '+' + fmt(pv.gain);
+}
+
+function renderState(){
+  const r = Game.run, pv = Game.preview(clampBet(V.bet), V.opt);
+  drawGauge(V.shown.stature);
+  $('s-runinfo').textContent = 'Run #' + r.no + ' · seed ' + r.seed;
+  $('m-ret').textContent = pv.rate.toFixed(2) + '×';
+  const vol = ExposureEngine.of(r.stature);
+  $('m-vol').textContent = ExposureEngine.level(vol) + ' · ' + pc(vol);
+  $('m-expnote').textContent = ExposureEngine.note(vol);
+  $('b-vol').style.width = clamp(vol * 100 / .58, 2, 100) + '%';
+  $('b-vol').style.background = StatureEngine.band(r.stature).color;
+  $('m-comp').textContent = Math.round(r.composure) + '%';
+  $('b-comp').style.width = clamp(r.composure, 2, 100) + '%';
+  $('b-comp').style.background = r.composure >= 60 ? '#4FB286' : r.composure >= 35 ? '#D9A23A' : '#D2455A';
+}
+
+function clampBet(b){
+  const r = Game.run, max = BetEngine.max(r.wallet);
+  b = Math.floor(b) || CONFIG.minBet;
+  if (b >= max) return max;                    /* everything you have */
+  return clamp(Math.round(b / 5) * 5, CONFIG.minBet, max);
+}
+
+function renderSlip(){
+  const r = Game.run, max = BetEngine.max(r.wallet);
+  V.bet = clampBet(V.bet);
+  const pv = Game.preview(V.bet, V.opt), band = StatureEngine.band(r.stature);
+  $('slip-no').textContent = 'Bet #' + (r.bets.length + 1);
+  if (document.activeElement !== $('amt')) $('amt').value = V.bet;
+  $('amt').max = max; $('range').max = max; $('range').value = V.bet;
+  $('b-minus').disabled = V.bet <= CONFIG.minBet; $('b-plus').disabled = V.bet >= max;
+
+  const opts = CONFIG.presets.map(v => ({ v, label:String(v) })).concat([{ v:max, label:'All in' }]);
+  $('presets').innerHTML = opts.map(o => {
+    const ok = o.v <= max && o.v >= CONFIG.minBet, g = ok ? Game.preview(o.v, V.opt).gain : 0;
+    return '<button class="preset" type="button" data-v="' + o.v + '" aria-pressed="' + (o.v === V.bet) + '"' + (ok ? '' : ' disabled title="Above your limit of ' + max + '"') + '><b>' + o.label + '</b><small>' + (ok ? '+' + fmt(g) : '—') + '</small></button>';
+  }).join('');
+
+  $('o-win').textContent = '+' + fmt(pv.gain);
+  $('o-winr').textContent = '+' + Math.round(pv.statureGain) + ' stature · pays ' + pv.rate.toFixed(2) + '×';
+  $('o-loss').textContent = '−' + fmt(pv.bet);
+  $('o-lossr').textContent = pv.e >= .999 ? 'everything you have · back to zero'
+    : '−' + CONFIG.stature.loss + ' stature · ' + pc(pv.e) + ' of your pride';
+  $('l-stat').textContent = Math.round(r.stature) + ' · ' + band.name;
+  $('l-exp').textContent = pc(pv.e);
+  $('l-expc').textContent = pv.cat.name;
+  $('l-expc').style.background = pv.cat.color + '24'; $('l-expc').style.color = pv.cat.color;
+  $('l-expbar').style.width = clamp(pv.e / CONFIG.maxExposure * 100, 1, 100) + '%';
+  $('l-expbar').style.background = pv.cat.color;
+  $('l-exprec').style.left = clamp(pv.rec / CONFIG.maxExposure * 100, 0, 99) + '%';
+  $('l-p').textContent = pc(pv.p);
+  $('l-skill').textContent = spc(pv.skill.total);
+  $('l-skill').className = 'v ' + (pv.skill.total > 0 ? 'up' : pv.skill.total < 0 ? 'down' : '');
+  $('l-skills').innerHTML = pv.skill.items.length
+    ? pv.skill.items.map(i => '<span class="' + (i[1] > 0 ? 'p' : 'n') + '">' + (i[1] > 0 ? '+' : '−') + Math.abs(i[1]) + ' ' + i[0] + '</span>').join('')
+    : '<span>No adjustments yet</span>';
+  $('l-luck').textContent = '±' + Math.round(pv.luck) + '%';
+  $('l-dq').textContent = pv.dq; $('l-dq').className = 'dq ' + pv.dq;
+  $('l-total').textContent = fmt(pv.bet) + ' PRIDE';
+  const isBet = r.situation && r.situation.kind === 'bet';
+  const live = r.status === 'live' && !V.busy;
+  $('l-move').textContent = isBet ? CONFIG.moves[V.opt].name + ' · ' + SIT_BY_ID[r.situation.id].opts[MOVE_KEYS.indexOf(V.opt)] : '—';
+  $('c-slip').classList.toggle('waiting', !isBet);
+  $('b-place').disabled = !live || !isBet;
+  $('b-place').textContent = !isBet ? 'Respond to the situation first' : 'Place bet · ' + fmt(pv.bet) + ' on ' + CONFIG.moves[V.opt].name.toLowerCase();
+  $('b-walk').disabled = !live;
+  $('b-ground2').disabled = !live || r.stones <= 0;
+  ['amt','range','b-minus','b-plus'].forEach(id => { if (!live) $(id).disabled = true; else if (id === 'amt' || id === 'range') $(id).disabled = false; });
+  document.querySelectorAll('.preset').forEach(b => { if (!live) b.disabled = true; });
+}
+
+function renderLedger(){
+  const r = Game.run, rows = [];
+  const byN = Object.fromEntries(r.bets.map(b => [b.n, b]));
+  r.log.forEach(e => {
+    if (e.t === 'bet'){
+      const b = byN[e.n]; if (!b) return;
+      rows.push('<tr><td class="n">#' + String(b.n).padStart(2, '0') + '</td>' +
+        '<td style="text-align:left;white-space:normal;min-width:150px"><span style="color:var(--text)">' + escapeHtml(b.title) + '</span><br><span style="font-size:11.5px;color:var(--mute)">' + CONFIG.moves[b.opt].name + ' · edge ' + (b.edge > 0 ? '+' : b.edge < 0 ? '−' : '±') + Math.abs(b.edge) + '%' + (b.read === true ? ' · read ✓' : b.read === false ? ' · read ✗' : '') + '</span></td>' +
+        '<td class="tn">' + fmt(b.amount) + '</td><td class="hm tn">' + Math.round(b.stature) + ' → ' + Math.round(b.statureAfter) + '</td>' +
+        '<td class="hm"><span class="dq ' + b.dq + '">' + b.dq + '</span></td>' +
+        '<td class="res tn ' + (b.win && !b.crash ? 'up' : 'down') + '">' + (b.crash ? 'CRASH ' : b.win ? 'WIN ' : 'LOSS ') + sgn(b.profit) + '</td></tr>');
+    } else if (e.t === 'ground'){
+      rows.push('<tr class="g"><td class="n">—</td><td style="text-align:left">Ego reset</td><td></td><td class="hm tn">' + Math.round(e.from) + ' → ' + Math.round(e.to) + '</td><td class="hm"></td><td class="res">Stone used</td></tr>');
+    } else if (e.t === 'pass'){
+      rows.push('<tr class="g" style="color:var(--mute)"><td class="n">—</td><td style="text-align:left;white-space:normal">Passed · ' + escapeHtml(e.title) + '</td><td></td><td class="hm"></td><td class="hm"></td><td class="res">Edge ' + (e.edge > 0 ? '+' : e.edge < 0 ? '−' : '±') + Math.abs(e.edge) + '%' + (e.read === true ? ' ✓' : e.read === false ? ' ✗' : '') + '</td></tr>');
+    } else if (e.t === 'reflect'){
+      rows.push('<tr class="g"><td class="n">—</td><td style="text-align:left;white-space:normal">' + escapeHtml(e.title) + ' · ' + escapeHtml(e.choice.toLowerCase()) + '</td><td></td><td class="hm tn">' + Math.round(e.from) + ' → ' + Math.round(e.to) + '</td><td class="hm"></td><td class="res">Reflection</td></tr>');
+    }
+  });
+  $('ledger').innerHTML = rows.reverse().slice(0, 15).join('');
+  const f = $('ledger').querySelector('tr'); if (f && V.newRow) f.classList.add('new'); V.newRow = false;
+  $('l-empty').hidden = r.log.length > 0;
+  const w = r.bets.filter(b => b.win).length;
+  const reads = r.readsRight + r.readsWrong;
+  $('l-sum').textContent = r.bets.length ? w + ' / ' + r.bets.length + ' won' + (reads ? ' · read ' + r.readsRight + '/' + reads : '') : '0 bets';
+}
+
+function previewRows(g){
+  return '<div><span class="k">Stature</span><span class="a">' + Math.round(g.from) + '</span><span class="ar">→</span><span class="b">' + Math.round(g.to) + '</span></div>' +
+    '<div><span class="k">Exposure</span><span class="a">' + pc(g.volFrom) + '</span><span class="ar">→</span><span class="b">' + pc(g.volTo) + '</span></div>' +
+    '<div><span class="k">Composure</span><span class="a">' + Math.round(g.compFrom) + '</span><span class="ar">→</span><span class="b">' + Math.round(g.compTo) + '</span></div>' +
+    '<div><span class="k">Payoff rate</span><span class="a">' + g.rateFrom.toFixed(2) + '×</span><span class="ar">→</span><span class="b">' + g.rateTo.toFixed(2) + '×</span></div>' +
+    '<div><span class="k">Humble Stones</span><span class="a">' + g.stones + '</span><span class="ar">→</span><span class="b">' + Math.max(0, g.stones - 1) + '</span></div>';
+}
+function renderRisk(){
+  const r = Game.run;
+  $('stones').innerHTML = [0,1,2].map(i => '<span class="stone' + (i >= r.stones ? ' x' : '') + '"></span>').join('');
+  $('stones').setAttribute('aria-label', r.stones + ' of 3 Humble Stones left');
+  $('g-preview').innerHTML = previewRows(Game.groundPreview());
+  $('b-ground').disabled = r.status !== 'live' || r.stones <= 0 || V.busy;
+  $('b-ground').textContent = r.stones ? 'Reset my ego · 1 stone' : 'No stones left';
+}
+
+function renderFeed(){
+  const r = Game.run, ev = r.events.filter(e => e.type !== 'Read').slice(-8).reverse();
+  $('feed').innerHTML = ev.length ? ev.map(e => '<li class="' + (e.type === 'Close call' ? 'close' : e.type === 'Mirror' ? 'mirror' : '') + '"><b>' + e.type + '</b><span><small>#' + String(e.n).padStart(2, '0') + '</small>' + escapeHtml(e.text) + '</span></li>').join('')
+    : '<li style="display:block;color:var(--mute-2)">Nothing yet. This is where the game describes what your betting is doing. It observes, it doesn\'t judge.</li>';
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c])); }
+
+function observe(type, text, follow, cls){
+  const o = $('observe');
+  o.className = 'observe flash' + (cls ? ' ' + cls : '');
+  void o.offsetWidth;
+  $('obs-t').textContent = type;
+  $('obs-m').firstChild.textContent = text;
+  const e = $('obs-e'); e.textContent = follow || ''; e.classList.remove('on');
+  clearTimeout(V.obsTimer);
+  if (follow) V.obsTimer = setTimeout(() => e.classList.add('on'), 1300);
+}
+
+/* ------------------------------------------------------- bet controls */
+function setBet(v){ V.bet = clampBet(v); renderSlip(); renderTop(); renderState(); renderSituation(); }
+$('b-minus').addEventListener('click', () => setBet(V.bet - (V.bet > 100 ? 25 : 5)));
+$('b-plus').addEventListener('click', () => setBet(V.bet + (V.bet >= 100 ? 25 : 5)));
+$('range').addEventListener('input', e => setBet(+e.target.value));
+$('amt').addEventListener('input', e => { const v = +e.target.value; if (v >= CONFIG.minBet){ V.bet = clampBet(v); renderSlip(); renderTop(); renderState(); renderSituation(); } });
+$('amt').addEventListener('change', e => { setBet(+e.target.value); $('amt').value = V.bet; });
+$('amt').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); $('amt').blur(); } });
+$('presets').addEventListener('click', e => { const b = e.target.closest('.preset'); if (b && !b.disabled) setBet(+b.dataset.v); });
+
+/* ------------------------------------------------------- resolution */
+function placeBet(){
+  const r = Game.run;
+  if (V.busy || r.status !== 'live') return;
+  Sound.init(); if (Sound.ctx && Sound.ctx.state === 'suspended') Sound.ctx.resume();
+  const res = Game.place(clampBet(V.bet), V.opt);
+  if (!res) return;
+  V.busy = true; Sound.place();
+  renderSlip(); renderRisk();
+  playResolution(res);
+}
+$('b-place').addEventListener('click', placeBet);
+
+function playResolution(res){
+  const { b, before } = res;
+  const ov = $('resolve'), steps = ['rs1','rs2','rs3','rs5','rs4'];
+  steps.forEach(id => $(id).classList.remove('on'));
+  $('rs-out').classList.remove('on'); $('rs-dq').classList.remove('on');
+  $('rs-head').textContent = b.title + ' · ' + CONFIG.moves[b.opt].name;
+  $('rs1v').textContent = fmt(b.amount) + ' PRIDE';
+  $('rs5v').textContent = '…';
+  $('rs-story').textContent = b.story;
+  $('rs2v').textContent = pc(b.base) + ' ' + spc(b.skill) + ' skill';
+  $('rs3v').textContent = '…';
+  $('rs4v').textContent = '…';
+  $('rs-big').textContent = b.crash ? 'Win' : b.win ? 'Win' : 'Loss';
+  $('rs-big').style.color = b.win ? 'var(--green)' : 'var(--crimson)';
+  $('rs-amt').textContent = (b.crash ? '+' + fmt(b.gain) : sgn(b.profit)) + ' PRIDE';
+  $('rs-amt').style.color = b.win ? 'var(--green)' : 'var(--crimson)';
+  $('rs-dqv').textContent = b.dq; $('rs-why').textContent = b.reason;
+  ov.hidden = false;
+
+  const T = reduced ? [0, 60, 120, 380, 500, 640, 760, 430] : [0, 200, 380, 950, 1500, 1750, 1900, 1150];
+  const HOLD = 5000;
+  const timers = [];
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+  let spin = null;
+  at(T[0], () => $('rs1').classList.add('on'));
+  at(T[1], () => $('rs2').classList.add('on'));
+  at(T[2], () => {
+    $('rs3').classList.add('on');
+    if (!reduced){
+      Sound.suspense(.75);
+      spin = setInterval(() => { $('rs3v').textContent = spc((Math.random() * 2 - 1) * b.luckRange); Sound.tick(); }, 55);
+    }
+  });
+  at(T[3], () => { clearInterval(spin); $('rs3v').textContent = spc(b.luck) + ' of ±' + Math.round(b.luckRange); $('rs5').classList.add('on'); });
+  at(T[7], () => {
+    $('rs5v').textContent = (b.edge > 0 ? 'Favourable +' : b.edge < 0 ? 'Unfavourable −' : 'Neutral ±') + Math.abs(b.edge) + '%';
+    $('rs5v').style.color = b.edge > 0 ? 'var(--green)' : b.edge < 0 ? 'var(--crimson)' : '';
+    $('rs4').classList.add('on'); $('rs4v').textContent = pc(b.pFinal);
+  });
+  at(T[4], () => { $('rs-out').classList.add('on'); b.win ? Sound.win(b.profit > b.amount * 1.6) : Sound.loss(); });
+  at(T[5], () => { $('rs-dq').classList.add('on'); applyState(res); });
+  at(T[6], () => { const c = $('rs-cont'); c.classList.add('on'); c.onclick = e => { e.stopPropagation(); close(); }; });
+
+  let closed = false;
+  function close(){
+    if (closed) return; closed = true;
+    timers.forEach(clearTimeout); clearInterval(spin);
+    if (!$('rs-dq').classList.contains('on')) applyState(res, true);
+    ov.hidden = true; ov.onclick = null;
+    $('rs-cont').classList.remove('on'); $('rs-cont').onclick = null;
+    afterResolution(res);
+  }
+  ov.onclick = close;
+  at(T[4] + HOLD, close);
+}
+
+let applied = null;
+function applyState(res, instant){
+  if (applied === res) return; applied = res;
+  const r = Game.run, { b, before } = res;
+  const ms = instant ? 0 : 700;
+  if (b.crash){
+    /* stature climbs past the line first, wallet waits for the crash reveal */
+    tween(before.stature, b.statureAfter, ms, v => { V.shown.stature = v; drawGauge(v); });
+    return;
+  }
+  const bal = $('w-bal');
+  bal.className = b.win ? 'up' : 'down';
+  setTimeout(() => { bal.className = ''; }, 800);
+  const gw = document.querySelector('.gauge');
+  if (gw){ gw.classList.remove('bump'); void gw.offsetWidth; gw.classList.add('bump'); }
+  tween(before.wallet, r.wallet, ms, v => { V.shown.wallet = v; $('w-bal').textContent = fmt(v); });
+  tween(before.stature, r.stature, ms, v => { V.shown.stature = v; drawGauge(v); });
+  V.newRow = true;
+  renderLedger(); renderFeed(); renderRisk();
+  $('m-comp').textContent = Math.round(r.composure) + '%';
+}
+
+function afterResolution(res){
+  const r = Game.run, { b } = res;
+  V.shown.wallet = b.crash ? V.shown.wallet : r.wallet;
+  V.shown.stature = r.stature;
+  $('lastres').hidden = false;
+  $('lastres').innerHTML = '<span>Last · moment #' + b.n + '</span><b class="' + (b.win && !b.crash ? 'up' : 'down') + '">' + (b.crash ? 'CRASH' : b.win ? 'WIN' : 'LOSS') + ' ' + sgn(b.profit) + '</b><span>' + b.dq + ' · ' + b.reason.toLowerCase() + '</span>';
+
+  if (b.crash){ showCrash(b.statureAfter, b.profit); return; }
+  V.busy = false;
+  renderAll();
+
+  if (b.near){
+    Game.run.events.push({ n:b.n, type:'Close call', text:b.near + ' point' + (b.near === 1 ? '' : 's') + ' from collapse. You survived.' });
+    renderFeed();
+    observe('Close call', b.near + ' point' + (b.near === 1 ? '' : 's') + ' from collapse. You survived.', 'Skill or luck?', 'close');
+  } else {
+    const readEv = res.events.find(e => e[0] === 'Read');
+    const psych = res.events.filter(e => e[0] !== 'Read').pop();
+    if (psych) observe(psych[0], psych[1], readEv ? readEv[1] : '');
+    else observe(b.win ? 'Win' : 'Loss', b.story + ' ' + (b.win ? 'Stature ' + Math.round(b.stature) + ' → ' + Math.round(r.stature) + '.' : 'Stature eased to ' + Math.round(r.stature) + '.'), readEv ? readEv[1] : '');
+  }
+  if (res.signature) setTimeout(showSignature, 350);
+  if (res.bust) setTimeout(() => finishRun('bust'), 900);
+  else if (res.complete) setTimeout(() => finishRun('complete'), res.signature ? 3600 : 1100);
+  else setTimeout(maybeRound, res.signature ? 3400 : 260);
+}
+
+/* ------------------------------------------------------- situation input */
+$('moves').addEventListener('click', e => {
+  const m = e.target.closest('.move'); if (!m || m.disabled) return;
+  if (m.dataset.opt){ V.opt = m.dataset.opt; Sound.init(); Sound.select(); renderSituation(); renderSlip(); renderTop(); renderState(); return; }
+  if (m.dataset.ref !== undefined){
+    Sound.init();
+    const before = Game.run.stature, res = Game.reflect(+m.dataset.ref); if (!res) return;
+    tween(before, res.to, reduced ? 0 : 700, v => { V.shown.stature = v; drawGauge(v); });
+    V.shown.stature = res.to;
+    if (res.crash){ V.busy = true; renderAll(); setTimeout(() => showCrash(res.to, res.loss), 500); return; }
+    renderAll(); maybeRound();
+    observe('Reflection', res.txt, res.to < before ? 'Quieter, and further from the line.' : 'Louder, and closer to it.');
+    if (res.complete) setTimeout(() => finishRun('complete'), 1100);
+  }
+});
+$('b-pass').addEventListener('click', () => {
+  const res = Game.pass(); if (!res) return;
+  Sound.init(); Sound.tick();
+  renderAll(); maybeRound();
+  observe('Passed', res.txt, 'Not playing is a decision too.');
+  if (res.complete) setTimeout(() => finishRun('complete'), 1100);
+});
+
+/* ------------------------------------------------------- round intro */
+function maybeRound(){
+  const r = Game.run;
+  if (!r || r.status !== 'live') return;
+  const rd = SituationEngine.roundOf(Math.min(r.turn, CONFIG.situation.turns));
+  if (rd.n === V.lastRound) return;
+  V.lastRound = rd.n;
+  showRound(rd);
+}
+function showRound(rd){
+  const m = $('mo-round');
+  $('ro-k').textContent = 'Round ' + rd.n + ' of ' + CONFIG.rounds.length;
+  $('ro-name').textContent = rd.name;
+  $('ro-sub').textContent = rd.sub;
+  $('ro-note').textContent = rd.note;
+  m.hidden = false;
+  Sound.init(); Sound.round(rd.n);
+  const bar = m.querySelector('.bar i');
+  if (bar){ bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
+  const close = () => { m.hidden = true; m.onclick = null; clearTimeout(t); };
+  const t = setTimeout(close, reduced ? 1200 : 2400);
+  m.onclick = close;
+}
+
+/* ------------------------------------------------------- moments */
+function showSignature(){
+  const m = $('mo-sig'), p = $('sig-p');
+  $('sig-num').textContent = Math.round(Game.run.stature);
+  p.classList.remove('on'); m.hidden = false;
+  const t1 = setTimeout(() => p.classList.add('on'), reduced ? 200 : 1100);
+  const t2 = setTimeout(close, reduced ? 1800 : 3200);
+  function close(){ clearTimeout(t1); clearTimeout(t2); m.hidden = true; m.onclick = null; observe('Signal', 'You feel in control. Nothing about the odds changed.'); }
+  m.onclick = close;
+}
+function showCrash(statureAfter, loss){
+  const r = Game.run;
+  V.shown.wallet = r.wallet; $('w-bal').textContent = fmt(r.wallet); renderTop();
+  Sound.crash();
+  const m = $('mo-crash');
+  $('cr-num').textContent = Math.round(statureAfter);
+  const sub = $('cr-sub'), btns = $('cr-btns');
+  sub.classList.remove('on'); btns.classList.remove('on');
+  sub.innerHTML = 'Peak pride <b>' + fmt(r.peakWallet) + '</b> · peak standing <b>' + Math.round(r.peakStature) + '</b> · peak exposure <b>' + pc(r.peakVol) + '</b><br>' +
+    'You reached <b>' + Math.round(statureAfter) + '</b>. The breaking point was <b>' + r.crashPoint + '</b>.<br>' +
+'Everything you built goes with it: <b style="color:var(--crimson)">' + sgn(loss) + ' PRIDE</b>. You are back to zero.<br>' +
+    '<span style="color:var(--mute)">That came from the published rules, not a hidden adjustment.</span>';
+  m.hidden = false;
+  setTimeout(() => sub.classList.add('on'), reduced ? 100 : 900);
+  setTimeout(() => btns.classList.add('on'), reduced ? 200 : 1600);
+  $('b-cr-go').onclick = () => { m.hidden = true; V.busy = false; finishRun('crash'); };
+}
+
+/* ------------------------------------------------------- ground / walk */
+function openGround(){
+  const r = Game.run; if (r.status !== 'live' || r.stones <= 0 || V.busy) return;
+  $('gr-preview').innerHTML = previewRows(Game.groundPreview());
+  openOv('ov-ground');
+}
+$('b-ground').addEventListener('click', openGround);
+$('b-ground2').addEventListener('click', openGround);
+$('b-gr-yes').addEventListener('click', () => {
+  closeOv('ov-ground');
+  const before = Game.run.stature, res = Game.ground(); if (!res) return;
+  Sound.init(); Sound.ground();
+  tween(before, Game.run.stature, reduced ? 0 : 900, v => { V.shown.stature = v; drawGauge(v); }, () => { V.shown.stature = Game.run.stature; renderAll(); });
+  const last = res.events[res.events.length - 1];
+  observe(last[0], last[1], last[0] === 'Grounded' ? 'You gave up momentum to protect the run.' : '');
+  renderLedger(); renderFeed(); renderRisk(); renderSlip();
+});
+
+$('b-walk').addEventListener('click', () => {
+  const r = Game.run; if (r.status !== 'live' || V.busy) return;
+  const d = r.wallet - r.startingWallet;
+  $('wk-kv').innerHTML =
+    '<div><span class="k">Current Pride</span><span class="v">' + fmt(r.wallet) + '</span></div>' +
+    '<div><span class="k">Starting Pride</span><span class="v">' + fmt(r.startingWallet) + '</span></div>' +
+    '<div><span class="k">Profit</span><span class="v ' + (d >= 0 ? 'up' : 'down') + '">' + sgn(d) + '</span></div>' +
+    '<div><span class="k">Current stature</span><span class="v">' + Math.round(r.stature) + ' · ' + StatureEngine.band(r.stature).name + '</span></div>' +
+    '<div><span class="k">Volatility</span><span class="v">' + pc(VolatilityEngine.of(r.stature)) + '</span></div>' +
+    '<div><span class="k">Humble Stones</span><span class="v">' + r.stones + ' remaining</span></div>';
+  $('wk-h').textContent = d > 0 ? 'Walk away with ' + sgn(d) + '?' : 'Walk away?';
+  openOv('ov-walk');
+});
+$('b-wk-yes').addEventListener('click', () => { closeOv('ov-walk'); finishRun('walk'); });
+
+/* ------------------------------------------------------- run end */
+const PATTERNS = {
+  chase:    ['You staked more right after things went badly.', 'Next run: keep the same size after a bad moment and see whether it comes back anyway.'],
+  escalate: ['Every run of wins made you stake more.', 'Next run: hold your stake steady through a streak and leave while it\u2019s good.'],
+  edge:     ['You spent the run within a few points of your breaking point.', 'Next run: reset your ego the first time you pass 60.'],
+  early:    ['You left before the climb really started.', 'Next run: stay in for three more moments after the first bad one.'],
+  big:      ['You staked far more than your standing could carry.', 'Next run: keep the pride-at-risk bar left of the white tick.'],
+  misread:  ['Your moves often went against what the room was telling you.', 'Next run: let the signal pick your move before you pick your stake.'],
+  steady:   ['Your stakes stayed steady and matched your standing.', 'Next run: keep that discipline while climbing higher.']
+};
+function playPattern(rec){
+  const n = rec.bets.length, avgE = analyticsService.avg(rec.bets.map(b => b.e));
+  if (rec.chases >= 2) return 'chase';
+  if ((rec.readsWrong || 0) >= 3 && rec.readsWrong > rec.readsRight) return 'misread';
+  if (rec.escalations >= 1 || (rec.winRaises >= 2 && rec.winRaises >= rec.winningBets * .6)) return 'escalate';
+  if (rec.outcome === 'EGO CRASH' || rec.crashPoint - rec.peakStature <= 5) return 'edge';
+  if (n < 6 && rec.outcome.startsWith('WALKED') && !rec.completed) return 'early';
+  if (avgE > .18) return 'big';
+  return 'steady';
+}
+
+function finishRun(kind){
+  if (Game.run.status === 'ended') return;
+  const out = Game.end(kind);
+  renderSummary(out);
+}
+
+function renderSummary(out){
+  const { rec, freshRecords, chResult, archetype, prevArch, challenge } = out;
+  const net = rec.endingWallet - rec.startingWallet;
+  if (rec.completed && rec.outcome !== 'SELF-AWARE') rec.title = 'Chapter complete.';
+  const titles = { 'EGO CRASH':'You fell. Back to zero.', 'OUT OF PRIDE':'Nothing left to risk.', 'WALKED AWAY':'You left on top.', 'WALKED AWAY DOWN':'You left while you still could.', 'SELF-AWARE':'Self-aware.' };
+  const leads = {
+    'EGO CRASH':'You crossed the breaking point. ' + fallReason(rec),
+    'OUT OF PRIDE':'You ran out of standing to stake. Look at the sizes you chose, not only the results.',
+    'WALKED AWAY':'You climbed, and you left while you were still up there. That is the whole skill.',
+    'WALKED AWAY DOWN':'You stopped while you were down. Harder than it sounds, and it kept the fall from happening.',
+    'SELF-AWARE':'You climbed, stepped back on purpose, never chased, and left ahead. That is the hardest version of this.'
+  };
+  const pat = PATTERNS[playPattern(rec)];
+  const q = { Strong:0, Sound:0, Risky:0, Reckless:0 }; rec.bets.forEach(b => q[b.q]++);
+  const n = Math.max(1, rec.bets.length);
+  const luckSaved = rec.bets.filter(b => b.w && (b.q === 'Risky' || b.q === 'Reckless')).length;
+  const luckCost = rec.bets.filter(b => !b.w && (b.q === 'Strong' || b.q === 'Sound')).length;
+  const dist = Math.round(rec.crashPoint - rec.peakStature);
+  const recLabel = Object.fromEntries(RECORDS.map(r => [r[0], r[1]]));
+
+  $('su-sheet').innerHTML =
+    '<span class="eyebrow">Run #' + rec.no + ' complete · seed ' + rec.seed + '</span>' +
+    '<h2 id="su-h">' + (rec.title || titles[rec.outcome]) + '</h2>' +
+    '<p class="lead">' + (rec.completed ? 'You played all ' + CONFIG.situation.turns + ' situations and finished ' + (net >= 0 ? 'ahead. ' : 'down. ') : '') + leads[rec.outcome] + '</p>' +
+    '<dl class="statgrid">' +
+      sg('Starting pride', fmt(rec.startingWallet)) + sg('Ending pride', fmt(rec.endingWallet)) +
+      sg('Net', '<span class="' + (net >= 0 ? 'up' : 'down') + '">' + sgn(net) + '</span>') + sg('Peak standing', Math.round(rec.peakStature) + ' · ' + StatureEngine.band(rec.peakStature).name) +
+      sg('Breaking point', '<span style="color:var(--crimson)">' + rec.crashPoint + '</span>') +
+      sg(dist > 0 ? 'Closest distance' : 'Crossed by', (dist > 0 ? dist : Math.abs(dist) + ' pts')) +
+      sg('Peak exposure', pc(rec.peakVol)) + sg('Biggest stake', fmt(rec.highestBet)) +
+      sg('Moments won', rec.winningBets + ' / ' + rec.totalBets) + sg('Near misses', rec.nearMisses) +
+      sg('Ego resets', rec.groundings.length + ' / 3') + sg('Largest loss', rec.largestLoss ? '−' + fmt(rec.largestLoss) : '—') +
+      sg('Situations', rec.turns + ' / ' + CONFIG.situation.turns) + sg('Read correctly', (rec.readsRight + rec.readsWrong) ? rec.readsRight + ' / ' + (rec.readsRight + rec.readsWrong) : '—') +
+      sg('Passed', rec.passes + (rec.passes ? ' (' + rec.goodPasses + ' good)' : '')) + sg('Moves S / B / A', rec.moves.safe + ' / ' + rec.moves.bold + ' / ' + rec.moves.allin) +
+    '</dl>' +
+    '<div class="chartbox"><div class="cap"><span>Your climb, against the breaking point you couldn\'t see</span>' +
+      '<span><i style="background:#4FB286"></i>win <i style="background:#D2455A;margin-left:8px"></i>loss <i style="background:#7F97C9;margin-left:8px"></i>ego reset <i style="background:#C8A64B;margin-left:8px"></i>reflection <i style="background:#626876;margin-left:8px"></i>passed</span></div>' + statureChart(rec) + '</div>' +
+    '<div class="insight">' +
+      '<div><div class="k">Your play pattern</div><p>' + pat[0] + '</p><small>' + (rec.chases ? rec.chases + ' raise' + (rec.chases === 1 ? '' : 's') + ' after a loss · ' : '') + (rec.winRaises ? rec.winRaises + ' raise' + (rec.winRaises === 1 ? '' : 's') + ' after a win · ' : '') + 'avg pride at risk ' + pc(analyticsService.avg(rec.bets.map(b => b.e)) || 0) + '</small></div>' +
+      '<div><div class="k">Judgement vs luck</div><p>' + (q.Strong + q.Sound) + ' of ' + rec.bets.length + ' decisions were sound.</p>' +
+        '<div class="dqbar">' + ['Strong','Sound','Risky','Reckless'].map(k => '<i style="width:' + (q[k] / n * 100) + '%;background:' + DQC[k] + '"></i>').join('') + '</div>' +
+        '<small>Luck rescued ' + luckSaved + ' weak bet' + (luckSaved === 1 ? '' : 's') + ' and cost you ' + luckCost + ' sound one' + (luckCost === 1 ? '' : 's') + '.</small></div>' +
+      '<div><div class="k">Next run</div><p>' + (challenge ? challenge.text : pat[1]) + '</p><small>' + (challenge ? challenge.why : '') + '</small></div>' +
+      '<div><div class="k">Current play pattern</div><p>' + archetype + '</p><small>' + ARCH[archetype] + (prevArch && prevArch !== archetype ? ' Previously: ' + prevArch + '.' : '') + '</small></div>' +
+    '</div>' +
+    '<div class="badges">' +
+      (rec.challenge ? '<span class="badge ' + (chResult ? 'ok' : 'no') + '">' + (chResult ? '✓ Challenge met: ' : 'Challenge not met: ') + escapeHtml(rec.challenge.text) + '</span>' : '') +
+      (rec.no === 1 ? '<span class="badge">First run · your personal records start here</span>' : freshRecords.map(k => '<span class="badge">New record · ' + recLabel[k] + '</span>').join('')) +
+    '</div>' +
+    '<div class="btns"><button class="btn-gold" id="b-again" type="button">Run again</button><button class="btn-line" id="b-su-rec" type="button">My records</button></div>';
+  openOv('ov-summary');
+  $('b-again').onclick = () => { closeOv('ov-summary'); startRun(); };
+  $('b-su-rec').onclick = () => { renderRecords(); openOv('ov-records'); };
+}
+const DQC = { Strong:'#4FB286', Sound:'#8E9AAF', Risky:'#D9A23A', Reckless:'#D2455A' };
+const OUT_LABEL = { 'EGO CRASH':'THE FALL', 'OUT OF PRIDE':'NOTHING LEFT', 'WALKED AWAY':'LEFT ON TOP', 'WALKED AWAY DOWN':'LEFT DOWN', 'SELF-AWARE':'SELF-AWARE' };
+function fallReason(rec){
+  const peak = rec.peakWallet, end = rec.endingWallet;
+  if (rec.escalations >= 1 || rec.winRaises >= 3) return 'You had already won. You kept raising the stakes.';
+  if (rec.chases >= 2) return 'You were trying to win back a moment that had already passed.';
+  if (rec.stonesLeft > 0 && rec.peakStature >= 70) return 'You reached the top, then kept climbing — with ' + rec.stonesLeft + ' way' + (rec.stonesLeft === 1 ? '' : 's') + ' to step back still unused.';
+  if (peak - end > peak * .4) return 'You stopped managing your exposure once people started watching.';
+  return 'You mistook confidence for certainty.';
+}
+function sg(k, v){ return '<div><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+
+function statureChart(rec){
+  const W = 840, H = 200, L = 34, R = 16, T = 14, B = 24;
+  const pts = rec.path && rec.path.length ? rec.path : [{ k:'s', s:CONFIG.startStature }];
+  const n = Math.max(1, pts.length - 1), maxY = 100;
+  const X = i => L + i / n * (W - L - R), Y = v => T + (1 - clamp(v, 0, maxY) / maxY) * (H - T - B);
+  const d = pts.map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(p.s).toFixed(1)).join(' ');
+  let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Stature by bet against the crash point">';
+  CONFIG.bands.forEach((b, i) => {
+    const top = i < CONFIG.bands.length - 1 ? CONFIG.bands[i + 1][0] : 100;
+    s += '<rect x="' + L + '" y="' + Y(top).toFixed(1) + '" width="' + (W - L - R) + '" height="' + (Y(b[0]) - Y(top)).toFixed(1) + '" fill="' + b[2] + '" fill-opacity=".05"/>';
+  });
+  [0, 25, 50, 70, 85, 100].forEach(v => { s += '<text x="' + (L - 6) + '" y="' + (Y(v) + 3.5).toFixed(1) + '" fill="#626876" font-size="10" font-family="IBM Plex Mono, monospace" text-anchor="end">' + v + '</text>'; });
+  s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(rec.crashPoint).toFixed(1) + '" y2="' + Y(rec.crashPoint).toFixed(1) + '" stroke="#D2455A" stroke-width="1.5" stroke-dasharray="6 4"/>';
+  s += '<text x="' + (W - R) + '" y="' + (Y(rec.crashPoint) - 6).toFixed(1) + '" fill="#D2455A" font-size="10.5" font-family="IBM Plex Mono, monospace" text-anchor="end">BREAKING POINT ' + rec.crashPoint + '</text>';
+  s += '<path d="' + d + '" fill="none" stroke="#C8A64B" stroke-width="2" stroke-linejoin="round"/>';
+  const COL = { g:'#7F97C9', r:'#C8A64B', p:'#626876' };
+  pts.forEach((p, i) => { if (!i) return; s += '<circle cx="' + X(i).toFixed(1) + '" cy="' + Y(p.s).toFixed(1) + '" r="3.6" fill="' + (COL[p.k] || (p.w ? '#4FB286' : '#D2455A')) + '" stroke="#0B0C0F" stroke-width="1.5"/>'; });
+  s += '<text x="' + L + '" y="' + (H - 6) + '" fill="#626876" font-size="10" font-family="Instrument Sans, sans-serif">Start</text>';
+  s += '<text x="' + (W - R) + '" y="' + (H - 6) + '" fill="#626876" font-size="10" font-family="Instrument Sans, sans-serif" text-anchor="end">Situation ' + (rec.turns || rec.bets.length) + '</text>';
+  return s + '</svg>';
+}
+
+/* ------------------------------------------------------- records */
+function renderRecords(){
+  const p = playerService.get(), runs = runService.list();
+  const allBets = runs.flatMap(r => r.bets || []);
+  const avgBet = analyticsService.avg(allBets.map(b => b.a)), avgE = analyticsService.avg(allBets.map(b => b.e));
+  let pl = 0, plUp = 0, pw = 0, pwUp = 0;
+  runs.forEach(r => (r.bets || []).forEach((b, i, a) => { if (!i) return; const pr = a[i - 1]; if (!pr.w){ pl++; if (b.a > pr.a) plUp++; } else { pw++; if (b.a > pr.a) pwUp++; } }));
+  const avgStat = analyticsService.avg(allBets.map(b => b.s));
+  const walkBets = analyticsService.avg(runs.filter(r => r.outcome.startsWith('WALKED') || r.outcome === 'SELF-AWARE').map(r => r.totalBets));
+
+  $('rc-body').innerHTML =
+    '<div class="arch"><div><div class="k">Current play pattern</div><div class="name">' + p.archetype + '</div><p>' + ARCH[p.archetype] + '</p></div>' +
+      '<div class="prev"><div class="k">Previous pattern</div><b>' + (p.prevArchetype || '—') + '</b><div class="k" style="margin-top:10px">Player</div><b>' + p.id + '</b></div></div>' +
+    '<p class="fine" style="margin-top:8px">Play patterns describe how you bet in GAMBULL, drawn from your last three runs. They say nothing about you outside the game.</p>' +
+    '<h3>Personal records</h3>' +
+    '<div class="recgrid">' + RECORDS.map(([k, label, f]) => {
+      const r = p.records[k];
+      return '<div class="rec' + (r ? '' : ' none') + '"><div class="k">' + label + '</div><div class="v">' + (r ? f(r.v) : '—') + '</div><div class="s">' + (r ? 'Run #' + r.run : 'Not set yet') + '</div></div>';
+    }).join('') + '</div>' +
+    '<h3>Behaviour</h3>' +
+    '<dl class="behav">' +
+      bh('Runs', p.totalRuns) + bh('Bets', fmt(p.totalBets)) + bh('Win rate', p.totalBets ? pc(p.totalWins / p.totalBets) : '—') +
+      bh('Average stake', allBets.length ? fmt(avgBet) : '—') + bh('Average pride at risk', allBets.length ? pc(avgE, 1) : '—') + bh('Average standing', allBets.length ? Math.round(avgStat) : '—') +
+      bh('Raise after a loss', pl ? pc(plUp / pl) : '—') + bh('Raise after a win', pw ? pc(pwUp / pw) : '—') + bh('Fall rate', p.totalRuns ? pc(p.totalCrashes / p.totalRuns) : '—') +
+      bh('Ego resets', p.totalGroundings) + bh('Exits on top', p.walkaways) + bh('Moments before leaving', walkBets ? walkBets.toFixed(1) : '—') +
+    '</dl>' +
+    '<h3>Run history</h3>' +
+    (runs.length ? '<div class="tw"><table class="runs"><thead><tr><th>Run</th><th>Result</th><th>Net</th><th>Peak</th><th>Crash pt</th><th>Bets</th><th>Pattern</th></tr></thead><tbody>' +
+      runs.slice().reverse().slice(0, 12).map(r => {
+        const net = r.endingWallet - r.startingWallet, oc = r.outcome === 'EGO CRASH' || r.outcome === 'OUT OF PRIDE' ? 'c' : r.outcome === 'SELF-AWARE' ? 's' : net >= 0 ? 'w' : 'd';
+        return '<tr><td class="mono">#' + r.no + '</td><td><span class="oct ' + oc + '">' + (OUT_LABEL[r.outcome] || r.outcome) + '</span></td><td class="' + (net >= 0 ? 'up' : 'down') + '">' + sgn(net) + '</td><td>' + Math.round(r.peakStature) + '</td><td>' + r.crashPoint + '</td><td>' + r.totalBets + '</td><td>' + (r.archetypeAtRun || '—') + '</td></tr>';
+      }).join('') + '</tbody></table></div>' : '<div class="empty" style="border:1px solid var(--line);border-radius:10px">Finish a run and it lands here.</div>') +
+    '<div class="btns"><button class="btn-line" id="b-rc-reset" type="button">Erase my records</button></div>' +
+    '<p class="fine">' + (Store.ok ? 'Saved in this browser. The records go through one service layer, so they can move to a real account later without changing the game.' : 'This browser blocks storage, so records only last for this visit.') + '</p>';
+  $('b-rc-reset').onclick = () => {
+    if (!confirm('Erase all runs, records and play patterns? Your current run restarts.')) return;
+    Backend.reset(); closeOv('ov-records'); startRun();
+  };
+}
+function bh(k, v){ return '<div><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+
+/* ------------------------------------------------------- overlays */
+function openOv(id){ $(id).hidden = false; const f = $(id).querySelector('.btn-gold, .btn-steel, .x'); f && f.focus(); }
+function closeOv(id){ $(id).hidden = true; }
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => {
+  if (e.target.closest('[data-close]') || (e.target === o && !['ov-summary','ov-intro'].includes(o.id))) o.hidden = true;
+}));
+addEventListener('keydown', e => {
+  if (e.key === 'Escape') ['ov-how','ov-ground','ov-walk','ov-records'].forEach(id => $(id).hidden = true);
+  if (e.key === '`' && e.target.tagName !== 'INPUT'){ $('debug').hidden = !$('debug').hidden; syncDebug(); }
+});
+$('btn-how').addEventListener('click', () => openOv('ov-how'));
+$('btn-records').addEventListener('click', () => { renderRecords(); openOv('ov-records'); });
+$('b-in-rec').addEventListener('click', () => { renderRecords(); openOv('ov-records'); });
+$('btn-sound').addEventListener('click', e => { Sound.on = !Sound.on; e.currentTarget.setAttribute('aria-pressed', String(Sound.on)); const s = Backend.getSettings(); s.sound = Sound.on; Backend.saveSettings(s); });
+$('b-start').addEventListener('click', () => {
+  closeOv('ov-intro');
+  const st = Backend.getSettings(); st.seenIntro = true; Backend.saveSettings(st);
+  Sound.init(); if (Sound.ctx && Sound.ctx.state === 'suspended') Sound.ctx.resume();
+  maybeRound();
+});
+
+/* ------------------------------------------------------- run lifecycle */
+function startRun(seed){
+  Game.newRun(seed);
+  V.bet = 50; V.opt = 'bold'; V.busy = false; applied = null;
+  V.shown.wallet = Game.run.wallet; V.shown.stature = Game.run.stature;
+  $('lastres').hidden = true;
+  const ch = Game.run.challenge;
+  observe(ch ? 'Challenge' : 'Start', ch ? ch.text : 'Nobody knows you yet. Stake some pride and see who notices.', ch ? ch.why : '');
+  V.lastRound = 0; V.shownSit = null; V.firstPaint = true;
+  renderAll();
+  if ($('ov-intro').hidden) maybeRound();
+}
+
+/* ------------------------------------------------------- debug */
+function syncDebug(){
+  const r = Game.run; if (!r) return;
+  $('d-seed').value = r.seed; $('d-wallet').value = r.wallet; $('d-stat').value = Math.round(r.stature);
+  $('d-comp').value = Math.round(r.composure); $('d-crash').value = r.crashPoint;
+  $('d-info').textContent = 'Crash point ' + r.crashPoint + ' · rng state ' + Game.rng.state.a;
+}
+$('debug').addEventListener('click', e => {
+  const b = e.target.closest('button[data-d]'); if (!b) return;
+  const r = Game.run, luck = $('d-luck').value;
+  switch (b.dataset.d){
+    case 'apply': r.wallet = +$('d-wallet').value || r.wallet; r.stature = clamp(+$('d-stat').value, 0, 100); r.composure = clamp(+$('d-comp').value, 0, 100); r.crashPoint = +$('d-crash').value || r.crashPoint;
+      r.peakStature = Math.max(r.peakStature, r.stature); V.shown.wallet = r.wallet; V.shown.stature = r.stature; Game.forced = luck !== '' ? { luck:+luck } : null; Game.persist(); break;
+    case 'win': Game.forced = { result:'win' }; break;
+    case 'loss': Game.forced = { result:'loss' }; break;
+    case 'near': r.stature = r.crashPoint - 5; V.shown.stature = r.stature; Game.forced = { result:'win' }; V.bet = Math.max(10, Math.round(r.wallet * .03 / 5) * 5); break;
+    case 'event': observe('Pattern', 'You\'ve raised your stake after every win.'); break;
+    case 'sig': showSignature(); break;
+    case 'crash': r.stature = r.crashPoint - 1; V.shown.stature = r.stature; Game.forced = { result:'win' }; break;
+    case 'reset': startRun($('d-seed').value); break;
+  }
+  renderAll(); syncDebug();
+});
+
+/* ------------------------------------------------------- boot */
+function boot(){
+  buildGauge();
+  const s = Backend.getSettings(); Sound.on = s.sound !== false; $('btn-sound').setAttribute('aria-pressed', String(Sound.on));
+  const live = Backend.getLive();
+  /* open the start screen first, so the round card doesn't play behind it */
+  if (!s.seenIntro || !live){
+    const ch = playerService.get().challenge;
+    $('in-ch').hidden = !ch;
+    if (ch){ $('in-chp').textContent = ch.text; $('in-chs').textContent = ch.why; }
+    openOv('ov-intro');
+  }
+  if (live && live.status === 'live' && live.bets){
+    Game.restore(live); V.shown.wallet = live.wallet; V.shown.stature = live.stature;
+    const last = live.events[live.events.length - 1];
+    observe('Resumed', 'Run #' + live.no + ' picked up where you left it.', last ? last.text : '');
+    renderAll();
+  } else startRun();
+}
+try { (window.claude && window.claude.hot && window.claude.hot.ready) ? window.claude.hot.ready(boot) : boot(); } catch(e){ boot(); }
+</script>
+
+</body>
+</html>
